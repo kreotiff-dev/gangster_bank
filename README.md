@@ -1,5 +1,11 @@
 # Интернет банк для обучения тестировщиков
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/Node.js-v14.17.0-green)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-v4.17.1-blue)](https://expressjs.com/)
+[![React](https://img.shields.io/badge/React-v17.0.2-blue)](https://reactjs.org/)
+[![Postgresql](https://img.shields.io/badge/Postgresql-v13.3-blue)](https://www.postgresql.org/)
+
 Добро пожаловать в репозиторий "Интернет банк для обучения тестировщиков"! Этот проект создан с целью обучения людей профессии тестировщик программного обеспечения.
 
 ## О проекте
