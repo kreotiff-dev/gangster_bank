@@ -19,9 +19,19 @@ class UserService {
             ...tokens,
             user: userDto
         }
-
     }
-
+    async confirmationCheck(code, phone) {
+        const user = await UserModel.getUserByPhone(phone)
+        if (!user) {
+            return false
+        }
+        if (user.confirmcode === code) {
+            await UserModel.confirm(phone)
+            return true
+        } else {
+            return false
+        }
+    }
 }
 
 module.exports = new UserService()

@@ -44,6 +44,19 @@ class UserModel {
             return null;
         }
     }
+
+    static async confirm(phone) {
+        const query = 'UPDATE users SET confirmed = true WHERE phone = $1';
+        const values = [phone];
+
+        try {
+            const result = await pool.query(query, values);
+            return result.rows[0];
+        } catch (error) {
+            console.error('Error getting user:', error);
+            return null;
+        }
+    }
 }
 
 module.exports = UserModel;
