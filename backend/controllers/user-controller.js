@@ -1,5 +1,8 @@
+const e = require('express');
 const userService = require('../service/user-service');
 const amqp = require('amqplib');
+const {validationResult} = require('express-validator')
+const ApiError = require('../exceptions/api-error')
 
 class UserController {
     sendCodeRequest = async (messageData) => {
@@ -13,13 +16,17 @@ class UserController {
             const channel = await connection.createChannel();
             await channel.assertQueue('code_requests');
             channel.sendToQueue('code_requests', Buffer.from(JSON.stringify(messageData)));
-        } catch (error) {
-            console.log(error);
+        } catch (e) {
+            next(e)
         }
     }
 
     registration = async (req, res, next) => {
         try {
+            const errors = validationResult(req)
+            if(!errors.isEmpty()) {
+                return next(ApiError.BadRequest('Ошибка при валидации', errors.array()))
+            }
             const { phone, email, password } = req.body;
             const userData = await userService.registration(phone, email, password);
 
@@ -30,22 +37,32 @@ class UserController {
             return res.json(userData);
 
         } catch (e) {
-            console.log(e);
+            next(e)
         }
     }
 
     login = async (req, res, next) => {
         try {
+            const {phone, password} = req.body
+            const userData = await userService.login(phone, password)
+            res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+            console.log(userData);
+            return res.json(userData);
 
         } catch(e) {
-            
+            next(e)
         }
     }
 
     logout = async (req, res, next) => {
         try {
+            const { refreshToken } = req.cookies
+            const token = await userService.logout(refreshToken)
+            res.clearCookie('refreshToken')
+            return res.status()
 
         } catch(e) {
+            next(e)
             
         }
     }
@@ -54,15 +71,19 @@ class UserController {
         try {
 
         } catch(e) {
-            
+            next(e)
         }
     }
 
     refresh = async (req, res, next) => {
         try {
+            const {refreshToken} = req.cookies;
+            const userData = await userService.refresh(refreshToken);
+            res.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
+            return res.json(userData);
 
         } catch(e) {
-            
+            next(e)
         }
     }
 
@@ -79,18 +100,17 @@ class UserController {
             }
 
         } catch(e) {
-            console.log(e);
-            res.status(500).json({ message: 'Произошла ошибка при проверке кода подтверждения' });
+            next(e)
         }
     }
 
     getUsers = async (req, res, next) => {
         try {
-            res.json(['123', '456']);
+            const users = await userService.getAllUsers()
+            return res.json(users)
 
         } catch(e) {
-            console.log(error);
-        res.status(500).json({ message: 'Произошла ошибка при проверке кода подтверждения' })
+            next(e)
         }
     }
 }

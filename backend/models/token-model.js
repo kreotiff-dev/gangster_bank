@@ -61,6 +61,32 @@ class TokenModel {
             return false;
         }
     }
+
+    static async deleteTokenByRefreshToken(refreshToken) {
+        const query = 'DELETE FROM user_tokens WHERE token = $1';
+        const values = [refreshToken];
+
+        try {
+            await pool.query(query, values);
+            return true;
+        } catch (error) {
+            console.error('Error deleting user tokens:', error);
+            return false;
+        }
+    }
+
+    static async findTokenByRefreshToken(refreshToken) {
+        const query = 'DELETE FROM user_tokens WHERE token = $1';
+        const values = [refreshToken];
+
+        try {
+            await pool.query(query, values);
+            return true;
+        } catch (error) {
+            console.error('Error deleting user tokens:', error);
+            return false;
+        }
+    }
 }
 
 module.exports = TokenModel;

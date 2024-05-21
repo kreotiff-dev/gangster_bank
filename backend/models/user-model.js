@@ -57,7 +57,18 @@ class UserModel {
             return null;
         }
     }
+
+    static async getUsers() {
+        const query = 'SELECT * FROM users';
+
+        try {
+            const result = await pool.query(query);
+            return result
+        } catch (error) {
+            console.error('Error getting user:', error);
+            return null;
+        }
+    }
 }
 
 module.exports = UserModel;
-

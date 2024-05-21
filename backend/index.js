@@ -6,12 +6,15 @@ const cookieParser = require('cookie-parser')
 const router = require('./routing/index')
 const PORT = process.env.PORT || 3000
 const app = express()
+const errorMiddleware = require('./middlewares/error-middleware')
+
 
 // Middleware
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors())
-app.use('/api', router);
+app.use('/api', router)
+app.use(errorMiddleware)
 
 // Запуск сервера
 const start = async () => {
