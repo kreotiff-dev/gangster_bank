@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import RegistrationForm from './components/RegistrationForm';
-import ConfirmationForm from './components/ConfirmationForm';
+import HomePage from './components/HomePage';
 import PersonalCabinet from './components/PersonalCabinet';
-import '../src/styles/App.css';
 
 
 const App: React.FC = () => {
@@ -21,24 +19,21 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <div className="App" style={{ backgroundImage: `url(${backgroundImage})` }}>
-      <img className="logo" src={logoImage} alt="Логотип" />
-        <Routes>
-          <Route path="/" element={
-            !showRegister && !showConfirm ? (
-              <div className='button-container'>
-                <button className='registration-btn' onClick={() => setShowRegister(true)}>Регистрация</button>
-                <button className='login-btn'>Авторизоваться</button>
-              </div>
-            ) : showRegister ? (
-              <RegistrationForm onRegister={handleRegister} closeForm={() => setShowRegister(false)} />
-            ) : (
-              <ConfirmationForm phoneNumber={phoneNumber} closeForm={() => setShowConfirm(false)} />
-            )
-          } />
-          <Route path="/personal-cabinet" element={<PersonalCabinet />} />
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/" element={
+          <HomePage 
+            showRegister={showRegister}
+            showConfirm={showConfirm}
+            phoneNumber={phoneNumber}
+            handleRegister={handleRegister}
+            setShowRegister={setShowRegister}
+            setShowConfirm={setShowConfirm}
+            logoImage={logoImage}
+            backgroundImage={backgroundImage}
+          />
+        } />
+        <Route path="/personal-cabinet" element={<PersonalCabinet />} />
+      </Routes>
     </Router>
   );
 }

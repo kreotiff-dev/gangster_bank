@@ -1,0 +1,53 @@
+.registrationForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 300px;
+    margin: 0 auto;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.btnNext {
+    background-color: #28a745;
+    width: 180px;
+}
+
+.btnBack {
+    background-color: #707070;
+    width: 180px;
+}
+
+.btnNext:hover {
+    background-color: #189234;
+}
+
+.btnBack:hover {
+    background-color: #5e5e5e;
+}
+
+.errorMessage {
+    background-color: #ffe4e1;
+    color: #8b0000;
+    padding: 10px;
+    border: 1px solid #8b0000;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.errorInput {
+    border-color: #ff0000;
+}
