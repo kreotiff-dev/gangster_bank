@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import '../src/styles/App.css';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import RegistrationForm from './components/RegistrationForm';
 import ConfirmationForm from './components/ConfirmationForm';
+import PersonalCabinet from './components/PersonalCabinet';
+import '../src/styles/App.css';
 
 
 const App: React.FC = () => {
@@ -18,19 +20,26 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="App" style={{ backgroundImage: `url(${backgroundImage})` }}>
-      <header className="App-header">
-        <img className="logo" src={logoImage} alt="Логотип" />
-        {!showRegister && !showConfirm && (
-          <div className='button-container'>
-            <button className='registration-btn' onClick={() => setShowRegister(true)}>Регистрация</button>
-            <button className='login-btn'>Авторизоваться</button>
-          </div>
-        )}
-        {showRegister && <RegistrationForm onRegister={handleRegister} closeForm={() => setShowRegister(false)} />}
-        {showConfirm && <ConfirmationForm phoneNumber={phoneNumber} closeForm={() => setShowConfirm(false)} />}
-      </header>
-    </div>
+    <Router>
+      <div className="App" style={{ backgroundImage: `url(${backgroundImage})` }}>
+      <img className="logo" src={logoImage} alt="Логотип" />
+        <Routes>
+          <Route path="/" element={
+            !showRegister && !showConfirm ? (
+              <div className='button-container'>
+                <button className='registration-btn' onClick={() => setShowRegister(true)}>Регистрация</button>
+                <button className='login-btn'>Авторизоваться</button>
+              </div>
+            ) : showRegister ? (
+              <RegistrationForm onRegister={handleRegister} closeForm={() => setShowRegister(false)} />
+            ) : (
+              <ConfirmationForm phoneNumber={phoneNumber} closeForm={() => setShowConfirm(false)} />
+            )
+          } />
+          <Route path="/personal-cabinet" element={<PersonalCabinet />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
