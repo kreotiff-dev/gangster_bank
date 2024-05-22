@@ -69,8 +69,8 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onRegister, closeFo
         <input type="password" name="password" placeholder="Пароль" value={formData.password} onChange={handleChange} required />
         <input type="password" name="confirmPassword" placeholder="Подтвердите пароль" value={formData.confirmPassword} onChange={handleChange} required />
         <div>
-          <button className={styles.btnBack} type="button" onClick={closeForm}>Назад</button>
-          <button className={styles.btnNext} type="submit">Продолжить</button>
+          <button className={`${styles.btn} ${styles.btnBack}`} type="button" onClick={closeForm}>Назад</button>
+          <button className={`${styles.btn} ${styles.btnNext}`} type="submit">Продолжить</button>
         </div>
         {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
       </form>
