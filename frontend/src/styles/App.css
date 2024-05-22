@@ -1,0 +1,82 @@
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+.App {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-size: 70%;
+    background-position: center;
+    background-color: #000;
+    background-repeat: no-repeat;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .registration-form {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  input {
+    display: block;
+    margin: 10px 0;
+    padding: 10px;
+    width: calc(100% - 22px);
+  }
+
+  .logo {
+    position: absolute; /* Позиционируем элемент абсолютно */
+    top: 20px; /* Располагаем элемент на 20px от верхней границы */
+    left: 50%; /* Располагаем элемент по центру горизонтально */
+    transform: translateX(-50%); /* Сдвигаем элемент влево на 50% его ширины, чтобы центрировать его */
+    height: 150px; /* Устанавливаем высоту логотипа */
+}  
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+button {
+    display: inline-block;
+    margin: 10px;
+    padding: 12px 24px;
+    font-size: 18px;
+    text-decoration: none;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 180px;
+}
+
+.registration-btn {
+    background-color: #007bff;
+}
+
+.login-btn {
+    background-color: #28a745;
+}
+.registration-btn:hover {
+    background-color: #0056b3; /* Изменяем цвет фона при наведении мыши */
+}
+.login-btn:hover {
+    background-color: #189234; /* Изменяем цвет фона при наведении мыши */
+}

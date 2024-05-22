@@ -1,0 +1,57 @@
+.registration-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 300px; /* Ширина формы */
+    margin: 0 auto; /* Центрирование формы */
+    }
+  
+label {
+    display: block; /* Размещаем label на новой строке */
+    margin-bottom: 5px; /* Пространство под label */
+    }
+  
+input {
+    width: 100%; /* Ширина поля ввода равна ширине формы */
+    padding: 8px; /* Внутренние отступы */
+    border: 1px solid #ccc; /* Граница поля */
+    border-radius: 4px; /* Закругленные углы */
+    box-sizing: border-box; /* Учитываем границу и внутренние отступы в общей ширине поля */
+    margin-bottom: 20px; /* Пространство между полями */
+    text-align: left; /* Выравнивание текста слева */
+    }
+  
+.btn-next {
+    background-color: #28a745;
+    width: 180px;
+    }
+
+.btn-back {
+    background-color: #707070;
+    width: 180px;
+    }
+  
+.btn-next:hover {
+    background-color: #189234; /* Изменяем цвет фона при наведении мыши */
+    }
+.btn-back:hover {
+    background-color: #5e5e5e; /* Изменяем цвет фона при наведении мыши */
+    }
+
+.error-message {
+  background-color: #ffe4e1; /* Розовый фон */
+  color: #8b0000; /* Темно-красный текст */
+  padding: 10px; /* Поля вокруг текста */
+  border: 1px solid #8b0000; /* Тонкая темно-красная граница */
+  border-radius: 5px; /* Закругленные углы */
+  margin-top: 10px; /* Отступ сверху */
+}
+
+.error {
+  /* Стили для родительского элемента при наличии ошибки */
+  border-color: #ff0000; /* Красная граница поля ввода */
+    }
+
+.error-input {
+  border-color: #ff0000; /* Красная граница поля ввода */
+}
