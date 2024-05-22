@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styles from '../styles/ConfirmationForm.module.css'
 
 interface ConfirmationFormProps {
   phoneNumber: string;
@@ -40,11 +41,11 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({ phoneNumber, closeF
   };
 
   return (
-    <form className="registration-form" onSubmit={handleSubmit}>
-      <p>Для подтверждения регистрации по номеру {phoneNumber} введите пятизначный код, который вам был отправлен.</p>
+    <form className={styles.conformationForm} onSubmit={handleSubmit}>
+      <p>Для подтверждения регистрации по номеру <span className={styles.highlight}>{phoneNumber}</span> введите пятизначный код, который вам был отправлен.</p>
       <input type="text" value={code} onChange={handleChange} placeholder="Введите код" maxLength={5} required />
-      <button className='btn-next' type="submit">Завершить</button>
-      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+      <button className={`${styles.btn} ${styles.btnNext}`} type="submit">Завершить</button>
+      {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
     </form>
   );
 }
