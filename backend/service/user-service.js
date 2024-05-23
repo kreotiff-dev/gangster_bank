@@ -79,6 +79,13 @@ class UserService {
         return users
     }
 
+    async getUser(userId) {
+        const user = await UserModel.getUserById(userId);
+        if (!user) {
+            throw ApiError.BadRequest(`User with id ${userId} not found`);
+        }
+        return new UserDto(user);
+    }
 
 }
 

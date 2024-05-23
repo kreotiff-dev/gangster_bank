@@ -111,6 +111,16 @@ class UserController {
             next(e)
         }
     }
+
+    getUser = async (req, res, next) => {
+        try {
+            const userId = req.params.id;
+            const user = await userService.getUser(userId);
+            return res.json(user);
+        } catch (e) {
+            next(e);
+        }
+    }
 }
 
 module.exports = new UserController();
