@@ -59,7 +59,7 @@ class UserController {
             const { refreshToken } = req.cookies
             const token = await userService.logout(refreshToken)
             res.clearCookie('refreshToken')
-            return res.status()
+            return res.status(204).send()
 
         } catch(e) {
             next(e)
@@ -92,10 +92,8 @@ class UserController {
             const { code, phone } = req.body;
             const confirmationResult = await userService.confirmationCheck(code, phone)
             if (confirmationResult) {
-                // Код подтверждения верный
                 res.status(200).json({ message: 'Код подтверждения верный' });
             } else {
-                // Код подтверждения неверный
                 res.status(400).json({ message: 'Код подтверждения неверный' });
             }
 
