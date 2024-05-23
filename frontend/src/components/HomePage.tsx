@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState }  from 'react';
 import RegistrationForm from './RegistrationForm';
 import ConfirmationForm from './ConfirmationForm';
+import LoginForm from './LoginForm';
 import styles from '../styles/HomePage.module.css';
 
 interface HomePageProps {
@@ -24,18 +25,22 @@ const HomePage: React.FC<HomePageProps> = ({
   logoImage,
   backgroundImage
 }) => {
+  const [showLogin, setShowLogin] = useState(false);
+
   return (
     <div className={styles.homePage} style={{ backgroundImage: `url(${backgroundImage})` }}>
       <img className={styles.logo} src={logoImage} alt="Логотип" />
-      {!showRegister && !showConfirm ? (
+      {!showRegister && !showConfirm && !showLogin ? (
         <div className={styles.buttonContainer}>
           <button className={styles.registrationBtn} onClick={() => setShowRegister(true)}>Регистрация</button>
-          <button className={styles.loginBtn}>Авторизоваться</button>
+          <button className={styles.loginBtn} onClick={() => setShowLogin(true)}>Авторизоваться</button>
         </div>
       ) : showRegister ? (
         <RegistrationForm onRegister={handleRegister} closeForm={() => setShowRegister(false)} />
-      ) : (
+      ) : showConfirm ? (
         <ConfirmationForm phoneNumber={phoneNumber} closeForm={() => setShowConfirm(false)} />
+      ) : (
+        <LoginForm closeForm={() => setShowLogin(false)} />
       )}
     </div>
   );

@@ -1,12 +1,18 @@
-import React, {FC, useContext, useState} from 'react';
-import {Context} from '../index';
-import {observer} from "mobx-react-lite";
+import {FC, useContext, useState} from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Context } from '../index';
+import { observer } from "mobx-react-lite";
 
-const LoginForm: FC = () => {
+interface LoginFormProps {
+    closeForm: () => void;
+  }
+
+const LoginForm: FC<LoginFormProps> = ({ closeForm }) => {
     const [phone, setPhone] = useState<string>('')
     const [email, setEmail] = useState<string>('')
     const [password, setPassword] = useState<string>('')
     const { store } = useContext(Context)
+    const navigate = useNavigate();
 
     return (
         <div>
@@ -31,11 +37,11 @@ const LoginForm: FC = () => {
                 name="password"
                 placeholder = 'Пароль'
             />
-            <button onClick={() => store.login(phone, email, password)}>Логин</button>
+            <button onClick={() => store.loginAndNavigate(phone, email, password, navigate)}>Логин</button>
             <button onClick={() => store.registration(phone, email, password)}>Регистрация</button>
-
+            <button onClick={closeForm}>Закрыть</button>
         </div>
     );
 };
 
-export default LoginForm;
+export default observer(LoginForm);
