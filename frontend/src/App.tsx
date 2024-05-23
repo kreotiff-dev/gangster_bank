@@ -7,6 +7,7 @@ import PersonalCabinet from './components/PersonalCabinet';
 const App: React.FC = () => {
   const [showRegister, setShowRegister] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showLogin, setShowLogin] = useState(false)
   const [phoneNumber, setPhoneNumber] = useState('');
   const logoImage = process.env.PUBLIC_URL + '/images/logo.png' || '';
   const backgroundImage = process.env.PUBLIC_URL + '/images/background.jpg' || '';
@@ -14,6 +15,7 @@ const App: React.FC = () => {
   const handleRegister = (phone: string) => {
     setPhoneNumber(phone);
     setShowRegister(false);
+    // setShowLogin(false);
     setShowConfirm(true);
   };
 
@@ -24,10 +26,12 @@ const App: React.FC = () => {
           <HomePage 
             showRegister={showRegister}
             showConfirm={showConfirm}
+            showLogin={showLogin}
             phoneNumber={phoneNumber}
             handleRegister={handleRegister}
             setShowRegister={setShowRegister}
             setShowConfirm={setShowConfirm}
+            setShowLogin={setShowLogin}
             logoImage={logoImage}
             backgroundImage={backgroundImage}
           />

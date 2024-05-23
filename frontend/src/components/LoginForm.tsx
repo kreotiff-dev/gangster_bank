@@ -2,12 +2,14 @@ import {FC, useContext, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Context } from '../index';
 import { observer } from "mobx-react-lite";
+import styles from '../styles/LoginForm.module.css'
 
 interface LoginFormProps {
     closeForm: () => void;
+    openRegisterForm: () => void;
   }
 
-const LoginForm: FC<LoginFormProps> = ({ closeForm }) => {
+const LoginForm: FC<LoginFormProps> = ({ closeForm, openRegisterForm }) => {
     const [phone, setPhone] = useState<string>('')
     const [email, setEmail] = useState<string>('')
     const [password, setPassword] = useState<string>('')
@@ -15,7 +17,7 @@ const LoginForm: FC<LoginFormProps> = ({ closeForm }) => {
     const navigate = useNavigate();
 
     return (
-        <div>
+        <div className={styles.loginForm}>
             <input 
                 onChange = {e => setPhone(e.target.value)}
                 value = {phone}
@@ -37,9 +39,13 @@ const LoginForm: FC<LoginFormProps> = ({ closeForm }) => {
                 name="password"
                 placeholder = 'Пароль'
             />
-            <button onClick={() => store.loginAndNavigate(phone, email, password, navigate)}>Логин</button>
-            <button onClick={() => store.registration(phone, email, password)}>Регистрация</button>
-            <button onClick={closeForm}>Закрыть</button>
+            <div>
+                <button className={`${styles.btn} ${styles.btnNext}`} onClick={() => store.login(phone, email, password, navigate)}>Логин</button>
+                <button className={`${styles.btn} ${styles.btnBack}`} onClick={closeForm}>Закрыть</button>
+            </div>
+            <div className={styles.registrationLinkContainer}>
+                <span>Нету аккаунта? <a href="#" onClick={openRegisterForm} className={styles.registrationLink}>Зарегистрируйтесь</a></span>
+            </div>
         </div>
     );
 };

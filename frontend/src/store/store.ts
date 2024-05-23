@@ -27,20 +27,20 @@ export default class Store {
         this.isLoading = bool;
     }
 
-    async login(phone: string, email: string, password: string): Promise<boolean>  {
+    async login(phone: string, email: string, password: string, navigate: NavigateFunction): Promise<void>  {
         try {
             const response = await AuthService.login(phone, email, password);
             localStorage.setItem('token', response.data.accessToken);
             this.setAuth(true);
             this.setUser(response.data.user);
-            return true;
+            console.log('Login successful, navigating to /personal-cabinet');
+            navigate('/personal-cabinet');
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 console.log(error?.response?.data?.message);
             } else {
                 console.error('Произошла непредвиденная ошибка', error);
             }
-            return false;
         }
     }
     async registration(phone: string, email: string, password: string) {
@@ -59,16 +59,20 @@ export default class Store {
         }
     }
 
-    async logout() {
+    async logout(navigate: NavigateFunction) {
+        console.log('Logout function called');
         try {
             const response = await AuthService.logout();
-            console.log(response)
+            console.log('Logout response:', response);
             localStorage.removeItem('token');
             this.setAuth(false);
             this.setUser({} as IUser);
+            console.log('Logout successful, navigating to /');
+            navigate('/');
         } catch (error: unknown) {
+            console.log('Logout error:', error);
             if (axios.isAxiosError(error)) {
-                console.log(error?.response?.data?.message);
+                console.log('Axios error message:', error?.response?.data?.message);
             } else {
                 console.error('Произошла непредвиденная ошибка', error);
             }
@@ -91,13 +95,6 @@ export default class Store {
             }
         } finally {
             this.setLoading(false);
-        }
-    }
-
-    async loginAndNavigate(phone: string, email: string, password: string, navigate: NavigateFunction) {
-        const success = await this.login(phone, email, password);
-        if (success) {
-            navigate('/personal-cabinet');
         }
     }
 }

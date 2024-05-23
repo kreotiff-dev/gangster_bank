@@ -7,10 +7,12 @@ import styles from '../styles/HomePage.module.css';
 interface HomePageProps {
   showRegister: boolean;
   showConfirm: boolean;
+  showLogin: boolean;
   phoneNumber: string;
   handleRegister: (phone: string) => void;
   setShowRegister: (value: boolean) => void;
   setShowConfirm: (value: boolean) => void;
+  setShowLogin: (value: boolean) => void;
   logoImage: string;
   backgroundImage: string;
 }
@@ -18,14 +20,15 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({
   showRegister,
   showConfirm,
+  showLogin,
   phoneNumber,
   handleRegister,
   setShowRegister,
   setShowConfirm,
+  setShowLogin,
   logoImage,
   backgroundImage
 }) => {
-  const [showLogin, setShowLogin] = useState(false);
 
   return (
     <div className={styles.homePage} style={{ backgroundImage: `url(${backgroundImage})` }}>
@@ -37,11 +40,11 @@ const HomePage: React.FC<HomePageProps> = ({
         </div>
       ) : showRegister ? (
         <RegistrationForm onRegister={handleRegister} closeForm={() => setShowRegister(false)} />
-      ) : showConfirm ? (
+      ) : showLogin ? (
+        <LoginForm closeForm={() => setShowLogin(false)} openRegisterForm={() => { setShowLogin(false); setShowRegister(true); }} />
+    ) : (
         <ConfirmationForm phoneNumber={phoneNumber} closeForm={() => setShowConfirm(false)} />
-      ) : (
-        <LoginForm closeForm={() => setShowLogin(false)} />
-      )}
+    )}
     </div>
   );
 };
