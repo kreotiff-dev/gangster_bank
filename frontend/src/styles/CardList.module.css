@@ -1,0 +1,73 @@
+.cardsList {
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-bottom: 20px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Добавляем тень */
+  background-color: #fff;
+  border-radius: 10px;
+  }
+  
+  .cardsContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+    
+  }
+  
+  .cardCarousel {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    width: 100%;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .cardCarousel::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .cardItem {
+    flex: 0 0 300px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    margin: 0 10px;
+  }
+  
+  .cardInfo {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #666;
+  }
+  
+  .navigationButton {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 8px 8px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 20px;
+  }
+  
+  .prevButton {
+    left: 1px;
+  }
+  
+  .nextButton {
+    right: 1px;
+  }
+  
