@@ -37,6 +37,7 @@ export default class Store {
         try {
             const response = await AuthService.login(phone, email, password);
             console.log('Login response:', response); // Логирование ответа сервера
+            console.log('Login access token:', response.data.accessToken); // Логирование accessToken
             localStorage.setItem('token', response.data.accessToken);
             this.setAuth(true);
             this.setUser(response.data.user);
@@ -50,7 +51,8 @@ export default class Store {
             }
         }
     }
-    async registration(phone: string, email: string, password: string) {
+
+    async registration(phone: string, email: string, password: string): Promise<void> {
         try {
             const response = await AuthService.registration(phone, email, password);
             console.log('Registration response:', response); // Логирование ответа сервера
@@ -64,7 +66,7 @@ export default class Store {
                 console.error('Произошла непредвиденная ошибка', error);
             }
         }
-    }
+    }   
 
     async logout(navigate: NavigateFunction) {
         console.log('Logout function called');

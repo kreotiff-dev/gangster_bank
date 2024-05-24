@@ -28,7 +28,9 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({ phoneNumber, closeF
       });
 
       if (response.ok) {
+        console.log('Navigate to /personal-cabinet');  // Лог перед редиректом
         navigate('/personal-cabinet');
+        console.log('Navigation executed');  // Лог после редиректа
       } else {
         const error = await response.json();
         setErrorMessage(`Ошибка подтверждения: ${error.message}`);

@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { FC, useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Context } from '../index';
+import { observer } from "mobx-react-lite";
 import styles from '../styles/RegistrationForm.module.css';
 
 interface RegistrationFormProps {
@@ -6,68 +9,84 @@ interface RegistrationFormProps {
   closeForm: () => void;
 }
 
-interface FormData {
-  phone: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  password: string;
-  confirmPassword: string;
-}
-
-const RegistrationForm: React.FC<RegistrationFormProps> = ({ onRegister, closeForm }) => {
-  const [formData, setFormData] = useState<FormData>({
-    phone: '',
-    email: '',
-    firstName: '',
-    lastName: '',
-    password: '',
-    confirmPassword: ''
-  });
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormData(prevFormData => ({
-      ...prevFormData,
-      [name]: value
-    }));
-  };
+const RegistrationForm: FC<RegistrationFormProps> = ({ onRegister, closeForm }) => {
+  const [phone, setPhone] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [firstName, setFirstName] = useState<string>('');
+  const [lastName, setLastName] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const { store } = useContext(Context);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
+    if (password !== confirmPassword) {
       setErrorMessage("Пароли не совпадают!");
       return;
     }
     try {
-        const response = await fetch('http://localhost:3000/api/registration', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        });
-        if (response.ok) {
-            onRegister(formData.phone);
-            closeForm();
-        } else {
-            const error = await response.json();
-            setErrorMessage(`Ошибка регистрации: ${error.message}`);
-        }
+      await store.registration(phone, email, password);
+      if (store.isAuth) {
+        onRegister(phone);
+        closeForm();
+      } else {
+        setErrorMessage('Ошибка регистрации');
+      }
     } catch (error) {
       setErrorMessage('Ошибка при отправке формы');
     }
   };
+
   return (
     <div className={styles.registrationForm}>
       <form onSubmit={handleSubmit}>
-        <input type="tel" name="phone" placeholder="Номер телефона" value={formData.phone} onChange={handleChange} required />
-        <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
-        <input type="text" name="firstName" placeholder="Имя" value={formData.firstName} onChange={handleChange} />
-        <input type="text" name="lastName" placeholder="Фамилия" value={formData.lastName} onChange={handleChange} />
-        <input type="password" name="password" placeholder="Пароль" value={formData.password} onChange={handleChange} required />
-        <input type="password" name="confirmPassword" placeholder="Подтвердите пароль" value={formData.confirmPassword} onChange={handleChange} required />
+        <input 
+          type="tel" 
+          name="phone" 
+          placeholder="Номер телефона" 
+          value={phone} 
+          onChange={e => setPhone(e.target.value)} 
+          required 
+        />
+        <input 
+          type="email" 
+          name="email" 
+          placeholder="Email" 
+          value={email} 
+          onChange={e => setEmail(e.target.value)} 
+          required 
+        />
+        <input 
+          type="text" 
+          name="firstName" 
+          placeholder="Имя" 
+          value={firstName} 
+          onChange={e => setFirstName(e.target.value)} 
+        />
+        <input 
+          type="text" 
+          name="lastName" 
+          placeholder="Фамилия" 
+          value={lastName} 
+          onChange={e => setLastName(e.target.value)} 
+        />
+        <input 
+          type="password" 
+          name="password" 
+          placeholder="Пароль" 
+          value={password} 
+          onChange={e => setPassword(e.target.value)} 
+          required 
+        />
+        <input 
+          type="password" 
+          name="confirmPassword" 
+          placeholder="Подтвердите пароль" 
+          value={confirmPassword} 
+          onChange={e => setConfirmPassword(e.target.value)} 
+          required 
+        />
         <div>
           <button className={`${styles.btn} ${styles.btnBack}`} type="button" onClick={closeForm}>Назад</button>
           <button className={`${styles.btn} ${styles.btnNext}`} type="submit">Продолжить</button>
@@ -78,4 +97,4 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onRegister, closeFo
   );
 }
 
-export default RegistrationForm;
+export default observer(RegistrationForm);
