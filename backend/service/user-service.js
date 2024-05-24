@@ -3,9 +3,11 @@ const bcrypt = require('bcrypt');
 const tokenService = require('./token-service');
 const UserDto = require('../dtos/user-dto');
 const ApiError = require('../exceptions/api-error');
+const logger = require('../utils/logger');
 
 class UserService {
     async registration(phone, email, password) {
+        logger.info(`Registering user: ${phone}, ${email}`);
         const candidate = await UserModel.getUserByPhone({ phone });
         if (candidate) {
             throw ApiError.BadRequest(`User with this phone ${phone} already exists`);
@@ -20,6 +22,7 @@ class UserService {
     }
 
     async confirmationCheck(code, phone) {
+        logger.info(`Checking confirmation code for phone: ${phone}`);
         const user = await UserModel.getUserByPhone(phone);
         if (!user) {
             return false;
@@ -33,6 +36,7 @@ class UserService {
     }
 
     async login(phone, password) {
+        logger.info(`Logging in user with phone: ${phone}`);
         const user = await UserModel.getUserByPhone(phone);
         if (!user) {
             throw ApiError.BadRequest(`User with ${phone} not found`);
@@ -49,11 +53,13 @@ class UserService {
     }
 
     async logout(refreshToken) {
+        logger.info(`Logging out user with refresh token: ${refreshToken}`);
         const token = await tokenService.removeToken(refreshToken);
         return token;
     }
 
     async refresh(refreshToken) {
+        logger.info(`Refreshing tokens with refresh token: ${refreshToken}`);
         if (!refreshToken) {
             throw ApiError.UnauthError();
         }
@@ -62,11 +68,13 @@ class UserService {
     }
 
     async getAllUsers() {
+        logger.info('Getting all users');
         const users = await UserModel.getUsers();
         return users;
     }
 
     async getUserById(userId) {
+        logger.info(`Getting user by ID: ${userId}`);
         const user = await UserModel.getUserById(userId);
         if (!user) {
             throw ApiError.BadRequest(`User with id ${userId} not found`);

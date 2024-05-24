@@ -1,30 +1,31 @@
 const ApiError = require('../exceptions/api-error');
 const tokenService = require('../service/token-service');
+const logger = require('../utils/logger');
 
 module.exports = function (req, res, next) {
     try {
         const authorizationHeader = req.headers.authorization;
         if (!authorizationHeader) {
-            console.error('Authorization header missing');
+            logger.error('Authorization header missing');
             return next(ApiError.UnauthError());
         }
 
         const accessToken = authorizationHeader.split(' ')[1];
         if (!accessToken) {
-            console.error('Access token missing');
+            logger.error('Access token missing');
             return next(ApiError.UnauthError());
         }
 
         const userData = tokenService.validateAccessToken(accessToken);
         if (!userData) {
-            console.error('Invalid access token');
+            logger.error('Invalid access token');
             return next(ApiError.UnauthError());
         }
 
         req.user = userData;
         next();
     } catch (e) {
-        console.error('Error in auth middleware:', e);
+        logger.error(`Error in auth middleware: ${e.message}`);
         return next(ApiError.UnauthError());
     }
 };
