@@ -1,6 +1,5 @@
 import axios from "axios";
 import {AuthResponse} from "../models/response/AuthResponse";
-import { config } from "process";
 
 export const API_URL = 'http://localhost:3000/api'
 
