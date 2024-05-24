@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './components/HomePage';
 import PersonalCabinet from './components/PersonalCabinet';
+import ProtectedRoute from './components/ProtectedRoute';
+import { Context } from './index';
+import { observer } from 'mobx-react-lite';
 
 
 const App: React.FC = () => {
@@ -15,9 +18,16 @@ const App: React.FC = () => {
   const handleRegister = (phone: string) => {
     setPhoneNumber(phone);
     setShowRegister(false);
-    // setShowLogin(false);
     setShowConfirm(true);
   };
+
+  const { store } = useContext(Context);
+
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      store.checkAuth();
+    }
+  }, [store]);
 
   return (
     <Router>
@@ -36,11 +46,13 @@ const App: React.FC = () => {
             backgroundImage={backgroundImage}
           />
         } />
-        <Route path="/personal-cabinet" element={<PersonalCabinet />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/personal-cabinet" element={<PersonalCabinet />} />
+        </Route>
       </Routes>
     </Router>
   );
 }
 
-export default App;
+export default observer(App);
 

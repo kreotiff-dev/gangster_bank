@@ -18,12 +18,13 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
+
     <Context.Provider value={{
       store
-    }}></Context.Provider>
+    }}>
     <App />
-  </React.StrictMode>
+    </Context.Provider>
+
 );
 
 reportWebVitals();

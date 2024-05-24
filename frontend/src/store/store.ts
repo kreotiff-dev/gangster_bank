@@ -10,6 +10,7 @@ export default class Store {
     user = {} as IUser;
     isAuth = false;
     isLoading = false;
+    isAuthChecked = false;
 
     constructor() {
         makeAutoObservable(this);
@@ -25,6 +26,10 @@ export default class Store {
 
     setLoading(bool: boolean) {
         this.isLoading = bool;
+    }
+
+    setAuthChecked(bool: boolean) {
+        this.isAuthChecked = bool; 
     }
 
     async login(phone: string, email: string, password: string, navigate: NavigateFunction): Promise<void>  {
@@ -81,20 +86,24 @@ export default class Store {
 
     async checkAuth() {
         this.setLoading(true);
+        console.log('Checking authentication...');
         try {
-            const response = await axios.get<AuthResponse>(`${API_URL}/refresh`, {withCredentials: true})
-            console.log(response);
+            const response = await axios.get<AuthResponse>(`${API_URL}/refresh`, { withCredentials: true });
+            console.log('Auth response:', response);
             localStorage.setItem('token', response.data.accessToken);
             this.setAuth(true);
             this.setUser(response.data.user);
         } catch (error: unknown) {
+            console.log('CheckAuth error:', error);
             if (axios.isAxiosError(error)) {
                 console.log(error?.response?.data?.message);
             } else {
                 console.error('Произошла непредвиденная ошибка', error);
             }
+            this.setAuth(false);
         } finally {
             this.setLoading(false);
+            this.setAuthChecked(true);
         }
     }
 }
