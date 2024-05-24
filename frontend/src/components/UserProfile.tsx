@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Context } from '../index';
 
 interface User {
+  id: string;
   firstname: string;
   lastname: string;
   phone: string;
@@ -15,6 +16,13 @@ const UserProfile: React.FC = () => {
   const { store } = useContext(Context);
 
   useEffect(() => {
+    console.log('User from store:', store.user); // Логирование данных пользователя
+
+    if (!store.user || !store.user.id) {
+      console.error('User ID is missing');
+      return;
+    }
+
     const fetchUserData = async () => {
       try {
         const response = await axios.get(`http://localhost:3000/api/users/${store.user.id}`, {
@@ -33,7 +41,7 @@ const UserProfile: React.FC = () => {
     };
       fetchUserData();
     
-  }, [store.isAuth, store.user.id]);
+  }, [store.isAuth, store.user, store.user.id]);
 
   return (
     <div className="container">

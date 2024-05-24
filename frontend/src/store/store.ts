@@ -22,6 +22,7 @@ export default class Store {
 
     setUser(user:IUser) {
         this.user = user;
+        console.log('User set:', user); // Логирование данных пользователя
     }
 
     setLoading(bool: boolean) {
@@ -35,6 +36,7 @@ export default class Store {
     async login(phone: string, email: string, password: string, navigate: NavigateFunction): Promise<void>  {
         try {
             const response = await AuthService.login(phone, email, password);
+            console.log('Login response:', response); // Логирование ответа сервера
             localStorage.setItem('token', response.data.accessToken);
             this.setAuth(true);
             this.setUser(response.data.user);
@@ -51,7 +53,7 @@ export default class Store {
     async registration(phone: string, email: string, password: string) {
         try {
             const response = await AuthService.registration(phone, email, password);
-            console.log(response)
+            console.log('Registration response:', response); // Логирование ответа сервера
             localStorage.setItem('token', response.data.accessToken);
             this.setAuth(true);
             this.setUser(response.data.user);
@@ -89,7 +91,7 @@ export default class Store {
         console.log('Checking authentication...');
         try {
             const response = await axios.get<AuthResponse>(`${API_URL}/auth/refresh`, { withCredentials: true });
-            console.log('Auth response:', response);
+            console.log('Auth response:', response); // Логирование ответа сервера
             localStorage.setItem('token', response.data.accessToken);
             this.setAuth(true);
             this.setUser(response.data.user);

@@ -25,7 +25,7 @@ export default class AuthService {
     }
 
     static async getUser(userId: string): Promise<AxiosResponse<User>> {
-        return $api.get<User>(`/users/user/${userId}`, {
+        return $api.get<User>(`/users/${userId}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
