@@ -5,6 +5,7 @@ const {validationResult} = require('express-validator')
 const ApiError = require('../exceptions/api-error')
 
 class UserController {
+    // Отправка запроса на код подтверждения
     sendCodeRequest = async (messageData) => {
         try {
             const connection = await amqp.connect({
@@ -21,6 +22,7 @@ class UserController {
         }
     }
 
+    // Регистрация пользователя
     registration = async (req, res, next) => {
         try {
             const errors = validationResult(req)
@@ -41,6 +43,7 @@ class UserController {
         }
     }
 
+    // Авторизация пользователя
     login = async (req, res, next) => {
         try {
             const {phone, password} = req.body
@@ -54,6 +57,7 @@ class UserController {
         }
     }
 
+    // Выход пользователя
     logout = async (req, res, next) => {
         try {
             const { refreshToken } = req.cookies
@@ -67,6 +71,7 @@ class UserController {
         }
     }
 
+    // Активация пользователя
     activate = async (req, res, next) => {
         try {
 
@@ -75,6 +80,7 @@ class UserController {
         }
     }
 
+    // Обновление токена
     refresh = async (req, res, next) => {
         try {
             const {refreshToken} = req.cookies;
@@ -87,6 +93,7 @@ class UserController {
         }
     }
 
+    // Подтверждение кода
     confirm = async (req, res, next) => {
         try {
             const { code, phone } = req.body;
@@ -102,6 +109,7 @@ class UserController {
         }
     }
 
+    // Получение всех пользователей
     getUsers = async (req, res, next) => {
         try {
             const users = await userService.getAllUsers()
@@ -112,6 +120,7 @@ class UserController {
         }
     }
 
+    // Получение пользователя по ID
     getUser = async (req, res, next) => {
         try {
             const userId = req.params.id;
