@@ -79,12 +79,12 @@ class UserService {
         return users
     }
 
-    async getUser(userId) {
+    async getUserById(userId) {
         const user = await UserModel.getUserById(userId);
         if (!user) {
             throw ApiError.BadRequest(`User with id ${userId} not found`);
         }
-        return new UserDto(user);
+        return user;
     }
 
 }
