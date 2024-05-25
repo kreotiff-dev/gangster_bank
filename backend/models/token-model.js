@@ -1,4 +1,5 @@
 const pool = require('../dbConfig');
+const logger = require('../utils/logger'); // Импорт логгера
 
 class TokenModel {
     static async createToken(userId, refreshToken) {
@@ -11,9 +12,10 @@ class TokenModel {
 
         try {
             const result = await pool.query(query, values);
+            logger.info(`Token created for user ID: ${userId}`);
             return result.rows[0];
         } catch (error) {
-            console.error('Error creating token:', error);
+            logger.error(`Error creating token: ${error.message}`);
             return null;
         }
     }
@@ -29,9 +31,10 @@ class TokenModel {
 
         try {
             const result = await pool.query(query, values);
+            logger.info(`Token updated for user ID: ${userId}`);
             return result.rows[0];
         } catch (error) {
-            console.error('Error updating token:', error);
+            logger.error(`Error updating token: ${error.message}`);
             return null;
         }
     }
@@ -42,9 +45,10 @@ class TokenModel {
 
         try {
             const result = await pool.query(query, values);
+            logger.info(`Token retrieved for user ID: ${userId}`);
             return result.rows;
         } catch (error) {
-            console.error('Error getting user tokens:', error);
+            logger.error(`Error getting user tokens: ${error.message}`);
             return null;
         }
     }
@@ -55,9 +59,10 @@ class TokenModel {
 
         try {
             await pool.query(query, values);
+            logger.info(`Token deleted for user ID: ${userId}`);
             return true;
         } catch (error) {
-            console.error('Error deleting user tokens:', error);
+            logger.error(`Error deleting user tokens: ${error.message}`);
             return false;
         }
     }
@@ -68,23 +73,25 @@ class TokenModel {
 
         try {
             await pool.query(query, values);
+            logger.info(`Token deleted with refresh token: ${refreshToken}`);
             return true;
         } catch (error) {
-            console.error('Error deleting user tokens:', error);
+            logger.error(`Error deleting user tokens: ${error.message}`);
             return false;
         }
     }
 
     static async findTokenByRefreshToken(refreshToken) {
-        const query = 'DELETE FROM user_tokens WHERE token = $1';
+        const query = 'SELECT * FROM user_tokens WHERE token = $1';
         const values = [refreshToken];
 
         try {
-            await pool.query(query, values);
-            return true;
+            const result = await pool.query(query, values);
+            logger.info(`Token found with refresh token: ${refreshToken}`);
+            return result.rows[0];
         } catch (error) {
-            console.error('Error deleting user tokens:', error);
-            return false;
+            logger.error(`Error finding token: ${error.message}`);
+            return null;
         }
     }
 }

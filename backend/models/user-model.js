@@ -1,4 +1,5 @@
-const pool = require('../dbConfig')
+const pool = require('../dbConfig');
+const logger = require('../utils/logger'); // Импорт логгера
 
 class UserModel {
     static async createUser(user) {
@@ -12,9 +13,10 @@ class UserModel {
 
         try {
             const result = await pool.query(query, values);
+            logger.info(`User created with phone: ${phone}`);
             return result.rows[0];
         } catch (error) {
-            console.error('Error creating user:', error);
+            logger.error(`Error creating user: ${error.message}`);
             return null;
         }
     }
@@ -25,9 +27,10 @@ class UserModel {
 
         try {
             const result = await pool.query(query, values);
+            logger.info(`User retrieved with ID: ${userId}`);
             return result.rows[0];
         } catch (error) {
-            console.error('Error getting user:', error);
+            logger.error(`Error getting user by ID: ${error.message}`);
             return null;
         }
     }
@@ -38,9 +41,10 @@ class UserModel {
 
         try {
             const result = await pool.query(query, values);
+            logger.info(`User retrieved with phone: ${phone}`);
             return result.rows[0];
         } catch (error) {
-            console.error('Error getting user:', error);
+            logger.error(`Error getting user by phone: ${error.message}`);
             return null;
         }
     }
@@ -51,9 +55,10 @@ class UserModel {
 
         try {
             const result = await pool.query(query, values);
+            logger.info(`User confirmed with phone: ${phone}`);
             return result.rows[0];
         } catch (error) {
-            console.error('Error getting user:', error);
+            logger.error(`Error confirming user: ${error.message}`);
             return null;
         }
     }
@@ -63,9 +68,10 @@ class UserModel {
 
         try {
             const result = await pool.query(query);
-            return result
+            logger.info('Retrieved all users');
+            return result;
         } catch (error) {
-            console.error('Error getting user:', error);
+            logger.error(`Error getting users: ${error.message}`);
             return null;
         }
     }

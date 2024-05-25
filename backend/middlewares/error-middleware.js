@@ -1,10 +1,11 @@
 const ApiError = require('../exceptions/api-error');
+const logger = require('../utils/logger'); // Импорт логгера
 
 // Middleware для обработки ошибок
 module.exports = function (err, req, res, next) {
     // Логирование ошибки с дополнительной информацией
-    console.error(`[${new Date().toISOString()}] ${req.method} ${req.url} - ${err.message}`);
-    
+    logger.error(`[${new Date().toISOString()}] ${req.method} ${req.url} - ${err.message}`);
+
     if (err instanceof ApiError) {
         // Обработка ошибок ApiError
         return res.status(err.status).json({ message: err.message, errors: err.errors });
