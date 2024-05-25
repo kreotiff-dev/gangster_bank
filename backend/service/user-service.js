@@ -3,11 +3,11 @@ const bcrypt = require('bcrypt');
 const tokenService = require('./token-service');
 const UserDto = require('../dtos/user-dto');
 const ApiError = require('../exceptions/api-error');
-const logger = require('../utils/logger');
+// const logger = require('../utils/logger');
 
 class UserService {
     async registration(phone, email, password) {
-        logger.info(`Registering user: ${phone}, ${email}`);
+        // logger.info(`Registering user: ${phone}, ${email}`);
         const candidate = await UserModel.getUserByPhone({ phone });
         if (candidate) {
             throw ApiError.BadRequest(`User with this phone ${phone} already exists`);
@@ -22,7 +22,7 @@ class UserService {
     }
 
     async confirmationCheck(code, phone) {
-        logger.info(`Checking confirmation code for phone: ${phone}`);
+        // logger.info(`Checking confirmation code for phone: ${phone}`);
         const user = await UserModel.getUserByPhone(phone);
         if (!user) {
             return false;
@@ -36,7 +36,7 @@ class UserService {
     }
 
     async login(phone, password) {
-        logger.info(`Logging in user with phone: ${phone}`);
+        // logger.info(`Logging in user with phone: ${phone}`);
         const user = await UserModel.getUserByPhone(phone);
         if (!user) {
             throw ApiError.BadRequest(`User with ${phone} not found`);
@@ -59,7 +59,7 @@ class UserService {
     }
 
     async refresh(refreshToken) {
-        logger.info(`Refreshing tokens with refresh token: ${refreshToken}`);
+        // logger.info(`Refreshing tokens with refresh token: ${refreshToken}`);
         if (!refreshToken) {
             throw ApiError.UnauthError();
         }
