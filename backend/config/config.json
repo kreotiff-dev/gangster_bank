@@ -1,0 +1,25 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": null,
+    "database": "postgres",
+    "host": "localhost",
+    "dialect": "postgres",
+    "JWT_ACCESS_SECRET": "e3cbb1f1b6c81e36f35db77e51684eb4b1a2f02601a48010453338e3c3581665",
+    "JWT_REFRESH_SECRET": "a7b0b1c80d496704faa961cde68340e31cee2e1f6eaa58de525e4e9e5a99b126"
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "database_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
