@@ -25,30 +25,30 @@ class TokenService {
     };
   }
 
-  async saveToken(user_id, refresh_token) {
-    console.log('Saving token for user:', user_id); // Debugging line
-    console.log('Refresh token:', refresh_token); // Debugging line
+  async saveToken(userId, refreshToken) {
+    console.log('Saving token for user:', userId); // Debugging line
+    console.log('Refresh token:', refreshToken); // Debugging line
 
-    if (!refresh_token) {
+    if (!refreshToken) {
         throw new Error('refresh_token is undefined'); // Debugging line to catch the issue early
       }
 
-    const tokenData = await Token.findOne({ where: { user_id } });
+    const tokenData = await Token.findOne({ where: { userId } });
     if (tokenData) {
-      tokenData.refresh_token = refresh_token;
+      tokenData.refreshToken = refreshToken;
       return tokenData.save();
     }
-    const token = await Token.create({ user_id, refresh_token });
+    const token = await Token.create({ userId, refreshToken });
     return token;
   }
 
-  async removeToken(refresh_token) {
-    const tokenData = await Token.destroy({ where: { refresh_token } });
+  async removeToken(refreshToken) {
+    const tokenData = await Token.destroy({ where: { refreshToken } });
     return tokenData;
   }
 
-  async findToken(refresh_token) {
-    const tokenData = await Token.findOne({ where: { refresh_token } });
+  async findToken(refreshToken) {
+    const tokenData = await Token.findOne({ where: { refreshToken } });
     return tokenData;
   }
 

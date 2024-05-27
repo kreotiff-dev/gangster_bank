@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
       // Define associations here
-      User.hasMany(models.Token, { foreignKey: 'user_id' });
+      User.hasMany(models.Token, { foreignKey: 'userId' });
     }
   }
 
@@ -14,21 +14,31 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+      validate: {
+        notEmpty: true,
+        is: /^[0-9+\-() ]+$/i, // Пример регулярного выражения для проверки номера телефона
+      }
     },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+      validate: {
+        isEmail: true,
+      }
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        notEmpty: true,
+      }
     },
-    first_name: {
+    firstName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    last_name: {
+    lastName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -36,10 +46,13 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    confirmCode: {
+      type: DataTypes.STRING,
+      defaultValue: null,
+    },
   }, {
     sequelize,
     modelName: 'User',
-    tableName: 'users', // Явное указание имени таблицы в стиле snake_case и во множественном числе
     timestamps: true, // Automatically add createdAt and updatedAt
     underscored: true, // Use snake_case for automatically added attributes
   });

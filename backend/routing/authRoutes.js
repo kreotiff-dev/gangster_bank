@@ -7,7 +7,7 @@ const { body } = require('express-validator');
 router.post('/registration', 
     body('phone').isMobilePhone(), 
     body('email').isEmail(), 
-    body('password').isLength({ min: 4, max: 12 }), 
+    body('password').isLength({ min: 6, max: 16 }), 
     userController.registration);
 
 // Маршрут для подтверждения пользователя

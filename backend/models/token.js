@@ -5,23 +5,22 @@ module.exports = (sequelize, DataTypes) => {
   class Token extends Model {
     static associate(models) {
       // Define associations here
-      Token.belongsTo(models.User, { foreignKey: 'user_id' });
+      Token.belongsTo(models.User, { foreignKey: 'userId' });
     }
   }
 
   Token.init({
-    user_id: {
+    userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    refresh_token: {
+    refreshToken: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
   }, {
     sequelize,
     modelName: 'Token',
-    tableName: 'tokens',
     timestamps: true,
     underscored: true,
   });

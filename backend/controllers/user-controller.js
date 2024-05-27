@@ -19,7 +19,7 @@ class UserController {
       const channel = await connection.createChannel();
       await channel.assertQueue('code_requests');
       channel.sendToQueue('code_requests', Buffer.from(JSON.stringify(messageData)));
-      logger.info(`Code request sent for user ID: ${messageData.user_id}`);
+      logger.info(`Code request sent for user ID: ${messageData.userId}`);
     } catch (e) {
       logger.error(`Error sending code request: ${e.message}`);
     }
@@ -33,11 +33,11 @@ class UserController {
         logger.error('Validation error:', errors.array());
         return next(ApiError.BadRequest('Ошибка при валидации', errors.array()));
       }
-      const { phone, email, password, first_name, last_name } = req.body;
+      const { phone, email, password, firstName, lastName } = req.body;
       console.log(req.body);  // Debugging line to check if data is received
-      const userData = await userService.registration(phone, email, password, first_name, last_name);
+      const userData = await userService.registration(phone, email, password, firstName, lastName);
 
-      await this.sendCodeRequest({ userId: userData.id, phone });
+      await this.sendCodeRequest({ userId: userData.user.id, phone }); //можно заложить дефект userId: userData.id - тогда не будет записываться в БД код
 
       res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
       logger.info(`User registered: ${JSON.stringify(userData)}`);
@@ -102,7 +102,7 @@ class UserController {
       }
       const userData = await authService.refresh(refreshToken);
       res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
-      logger.info(`Token refreshed for user ID: ${userData.id}`);
+      logger.info(`Token refreshed for user ID: ${userData.user.id}`);
       return res.json(userData);
 
     } catch (e) {
@@ -146,9 +146,9 @@ class UserController {
   // Получение пользователя по ID
   getUser = async (req, res, next) => {
     try {
-      const user_id = req.params.id;
-      const user = await userService.getUserById(user_id);
-      logger.info(`Retrieved user by ID: ${user_id}`);
+      const userId = req.params.id;
+      const user = await userService.getUserById(userId);
+      logger.info(`Retrieved user by ID: ${userId}`);
       return res.json(user);
     } catch (e) {
       logger.error(`Error getting user by ID: ${e.message}`);

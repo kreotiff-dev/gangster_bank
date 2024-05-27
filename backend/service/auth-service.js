@@ -23,9 +23,9 @@ class AuthService {
         return { ...tokens, user: userDto };
     }
 
-    async logout(refresh_token) {
-        logger.info(`Logging out user with refresh token: ${refresh_token}`);
-        const token = await tokenService.removeToken(refresh_token);
+    async logout(refreshToken) {
+        logger.info(`Logging out user with refresh token: ${refreshToken}`);
+        const token = await tokenService.removeToken(refreshToken);
         return token;
     }
 

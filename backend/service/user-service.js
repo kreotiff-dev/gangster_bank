@@ -3,17 +3,17 @@ const bcrypt = require('bcrypt');
 const tokenService = require('./token-service');
 const UserDto = require('../dtos/user-dto');
 const ApiError = require('../exceptions/api-error');
-// const logger = require('../utils/logger');
+const logger = require('../utils/logger');
 
 class UserService {
-    async registration(phone, email, password, first_name, last_name) {
+    async registration(phone, email, password, firstName, lastName) {
         logger.info(`Registering user: ${phone}, ${email}`);
         const candidate = await User.findOne({ where: { phone } });
         if (candidate) {
             throw ApiError.BadRequest(`User with this phone ${phone} already exists`);
         }
         const hashPassword = await bcrypt.hash(password, 3);
-        const user = await User.create({ phone, email, password: hashPassword, first_name, last_name });
+        const user = await User.create({ phone, email, password: hashPassword, firstName, lastName });
         const userDto = new UserDto(user);
         const tokens = tokenService.generateTokens({ ...userDto });
 
@@ -28,10 +28,11 @@ class UserService {
     async confirmationCheck(code, phone) {
         logger.info(`Checking confirmation code for phone: ${phone}`);
         const user = await User.findOne({ where: { phone } });
+        console.log('Содержимое user', user)
         if (!user) {
             return false;
         }
-        if (user.confirm_code === code) {
+        if (user.confirmCode === code) {
             user.confirmed = true;
             await user.save();
             return true;
@@ -65,10 +66,10 @@ class UserService {
     }
 
     async getUserById(userId) {
-        logger.info(`Getting user by ID: ${user_id}`);
+        logger.info(`Getting user by ID: ${userId}`);
         const user = await User.findByPk(userId);
         if (!user) {
-            throw ApiError.BadRequest(`User with id ${user_id} not found`);
+            throw ApiError.BadRequest(`User with id ${userId} not found`);
         }
         return user;
     }
