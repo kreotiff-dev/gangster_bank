@@ -27,14 +27,14 @@ const start = async () => {
     try {
         pool.query('SELECT NOW()', (err, res) => {
             if (err) {
-                logger.error(`Error connecting to DB: ${err.message}`);
+                // logger.error(`Error connecting to DB: ${err.message}`);
             } else {
-                logger.info(`Current time from database: ${res.rows[0].now}`);
+                // logger.info(`Current time from database: ${res.rows[0].now}`);
                 app.listen(PORT, () => logger.info(`Server started on port ${PORT}`));
             }
         });
     } catch (e) {
-        logger.error(`Error starting the server: ${e.message}`);
+        // logger.error(`Error starting the server: ${e.message}`);
     }
 }
 

@@ -1,13 +1,14 @@
-const UserModel = require("../models/user-model");
+const { User } = require('../models');
 
-module.exports = class UserDto {
-    email;
-    id;
-    confirmed;
-
-    constructor(model) {
-        this.email = model.email
-        this.id = model.id
-        this.confirmed = model.confirmed
-    }
+class UserDto {
+  constructor(model) {
+    this.id = model.id;
+    this.email = model.email;
+    this.phone = model.phone;
+    this.first_name = model.first_name;
+    this.last_name = model.last_name;
+    this.confirmed = model.confirmed;
+  }
 }
+
+module.exports = UserDto;

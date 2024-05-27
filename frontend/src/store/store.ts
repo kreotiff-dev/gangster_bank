@@ -90,19 +90,21 @@ export default class Store {
 
     async checkAuth() {
         this.setLoading(true);
-        console.log('Checking authentication...');
+        // logger.info('Checking authentication...');
         try {
             const response = await axios.get<AuthResponse>(`${API_URL}/auth/refresh`, { withCredentials: true });
-            console.log('Auth response:', response); // Логирование ответа сервера
+            // logger.info('Auth response:', response);
             localStorage.setItem('token', response.data.accessToken);
+            // logger.info('Access token saved to local storage');
             this.setAuth(true);
             this.setUser(response.data.user);
+            // logger.info('User authenticated and set');
         } catch (error: unknown) {
-            console.log('CheckAuth error:', error);
+            // logger.error('CheckAuth error:', error);
             if (axios.isAxiosError(error)) {
-                console.log(error?.response?.data?.message);
+                // logger.error('Axios error message:', error.response?.data?.message);
             } else {
-                console.error('Произошла непредвиденная ошибка', error);
+                // logger.error('Unexpected error:', error);
             }
             this.setAuth(false);
         } finally {
