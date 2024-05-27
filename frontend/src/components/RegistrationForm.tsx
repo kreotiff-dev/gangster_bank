@@ -1,5 +1,4 @@
 import React, { FC, useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Context } from '../index';
 import { observer } from "mobx-react-lite";
 import styles from '../styles/RegistrationForm.module.css';
