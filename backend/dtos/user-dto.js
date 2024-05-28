@@ -1,5 +1,3 @@
-const { User } = require('../models');
-
 class UserDto {
   constructor(model) {
     this.id = model.id;

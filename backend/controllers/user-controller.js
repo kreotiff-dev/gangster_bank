@@ -1,20 +1,21 @@
 const userService = require('../service/user-service');
 const authService = require('../service/auth-service');
-const tokenService = require('../service/token-service'); // Импорт нового сервиса токенов
 const { validationResult } = require('express-validator');
 const ApiError = require('../exceptions/api-error');
 const logger = require('../utils/logger');
 const amqp = require('amqplib');
+const config = require('../config/config')
+const { connectRedis } = require('../config/redisClient');
 
 class UserController {
   // Отправка запроса на код подтверждения
   sendCodeRequest = async (messageData) => {
     try {
       const connection = await amqp.connect({
-        hostname: '37.46.129.245',
-        port: 5672,
-        username: 'admin',
-        password: '123456'
+        hostname: config.RABBITMQ_HOST,
+        port: config.RABBITMQ_PORT,
+        username: config.RABBITMQ_USER,
+        password: config.RABBITMQ_PASSWORD
       });
       const channel = await connection.createChannel();
       await channel.assertQueue('code_requests');
@@ -67,14 +68,26 @@ class UserController {
   // Выход пользователя
   logout = async (req, res, next) => {
     try {
-      const { refreshToken } = req.cookies; // Используйте camelCase
+      const { refreshToken } = req.cookies;
+      const authorizationHeader = req.headers.authorization;
+      const accessToken = authorizationHeader ? authorizationHeader.split(' ')[1] : null;
+
       logger.info(`Logging out user with refresh token: ${refreshToken}`);
+
       if (!refreshToken) {
         throw ApiError.UnauthError();
       }
-      await userService.logout(refreshToken); // Передайте переменную правильно
+      await userService.logout(refreshToken);
+
+      if (accessToken) {
+        const client = await connectRedis();
+        await client.set(`blacklist_${accessToken}`, 'true');
+      }
+
       res.clearCookie('refreshToken');
+
       logger.info('User logged out');
+
       return res.status(204).send();
     } catch (e) {
       logger.error(`Error in logout: ${e.message}`);
@@ -85,7 +98,6 @@ class UserController {
   // Активация пользователя
   activate = async (req, res, next) => {
     try {
-      // Реализация активации пользователя
     } catch (e) {
       logger.error(`Error in activation: ${e.message}`);
       next(e);

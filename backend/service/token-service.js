@@ -1,9 +1,9 @@
 const { Token } = require('../models');
 const jwt = require('jsonwebtoken');
-const path = require('path');
-const config = require(path.resolve(__dirname, '../config/config.json'))[process.env.NODE_ENV || 'development'];
+const config = require('../config/config');
 const ApiError = require('../exceptions/api-error');
 const UserDto = require('../dtos/user-dto');
+const client = require('../config/redisClient');
 
 console.log('Current environment:', process.env.NODE_ENV); // Debugging line
 console.log('Config:', config); // Debugging line
@@ -53,6 +53,7 @@ class TokenService {
   }
 
   validateAccessToken(token) {
+    console.log("Payload user:", token)
     try {
       const userData = jwt.verify(token, config.JWT_ACCESS_SECRET);
       return userData;
@@ -83,6 +84,21 @@ class TokenService {
     const tokens = this.generateTokens({ ...userDto });
     await this.saveToken(userDto.id, tokens.refreshToken);
     return { ...tokens, user: userDto };
+  }
+
+  async addTokenToBlacklist(token) {
+    const { exp } = jwt.decode(token);
+    const currentTime = Math.floor(Date.now() / 1000);
+    const ttl = exp - currentTime;
+
+    if (ttl > 0) {
+      await client.set(token, 'blacklisted', 'EX', ttl);
+    }
+  }
+
+  async isTokenBlacklisted(token) {
+    const result = await client.get(token);
+    return result !== null;
   }
 }
 

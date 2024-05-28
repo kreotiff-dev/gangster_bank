@@ -1,8 +1,9 @@
 const ApiError = require('../exceptions/api-error');
 const tokenService = require('../service/token-service');
+const { connectRedis } = require('../config/redisClient');
 const logger = require('../utils/logger');
 
-module.exports = function (req, res, next) {
+module.exports = async function (req, res, next) {
     try {
         const authorizationHeader = req.headers.authorization;
         
@@ -17,16 +18,23 @@ module.exports = function (req, res, next) {
             return next(ApiError.UnauthError()); // Возвращаем ошибку, если токен отсутствует
         }
 
+        const client = await connectRedis();
+
+        const isBlacklisted = await client.get(`blacklist_${accessToken}`);
+        if (isBlacklisted) {
+            return next(ApiError.UnauthError());
+        }
+
         const userData = tokenService.validateAccessToken(accessToken);
         if (!userData) {
             logger.error('Invalid access token');
-            return next(ApiError.UnauthError()); // Возвращаем ошибку, если токен невалиден
+            return next(ApiError.UnauthError());
         }
 
         req.user = userData;
-        next(); // Переход к следующему middleware или маршруту
+        next(); 
     } catch (e) {
         logger.error(`Error in auth middleware: ${e.message}`);
-        return next(ApiError.UnauthError()); // Возвращаем ошибку при возникновении исключения
+        return next(ApiError.UnauthError());
     }
 };
