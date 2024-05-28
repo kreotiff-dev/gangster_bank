@@ -10,8 +10,12 @@ const ProtectedRoute: React.FC = () => {
     useEffect(() => {
         const checkAuth = async () => {
           if (localStorage.getItem('token')) {
-            console.log('авторизован=)');
-            await store.checkAuth();
+            try {
+              console.log('Checking authentication...');
+              await store.checkAuth();
+            } catch (error) {
+              console.error('Ошибка проверки аутентификации:', error);
+            }
           }
           setIsCheckingAuth(false);
         };

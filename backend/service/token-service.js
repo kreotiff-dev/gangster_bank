@@ -53,36 +53,49 @@ class TokenService {
   }
 
   validateAccessToken(token) {
-    console.log("Payload user:", token)
+    console.log("Validating access token:", token)
     try {
       const userData = jwt.verify(token, config.JWT_ACCESS_SECRET);
+      console.log('Access token valid:', userData); // Debugging line
       return userData;
     } catch (e) {
+      console.error('Access token validation error:', e); // Debugging line
       return null;
     }
   }
 
   validateRefreshToken(token) {
+    console.log('Validating refresh token:', token); // Debugging line
     try {
       const userData = jwt.verify(token, config.JWT_REFRESH_SECRET);
+      console.log('Refresh token valid:', userData); // Debugging line
       return userData;
     } catch (e) {
+      console.log('Refresh token validation error:', e); // Debugging line
       return null;
     }
   }
 
   async refreshTokens(refreshToken) { // Обновление токенов
+    console.log('Refreshing tokens with refresh token:', refreshToken); // Debugging line
     const tokenData = await this.findToken(refreshToken);
     if (!tokenData) {
       throw ApiError.UnauthError();
     }
+
+    // Проверка актуальности refreshToken
     const userData = this.validateRefreshToken(refreshToken);
     if (!userData) {
       throw ApiError.UnauthError();
     }
+
     const userDto = new UserDto(userData);
     const tokens = this.generateTokens({ ...userDto });
+
+    // Сначала сохранение новых токенов
     await this.saveToken(userDto.id, tokens.refreshToken);
+    console.log('Refreshed tokens:', tokens); // Debugging line
+
     return { ...tokens, user: userDto };
   }
 

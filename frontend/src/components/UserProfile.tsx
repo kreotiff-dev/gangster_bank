@@ -4,8 +4,8 @@ import { Context } from '../index';
 
 interface User {
   id: string;
-  firstname: string;
-  lastname: string;
+  firstName: string;
+  lastName: string;
   phone: string;
   email: string;
   // Добавьте дополнительные поля по необходимости
@@ -35,6 +35,7 @@ const UserProfile: React.FC = () => {
           throw new Error('Network response was not ok');
         }
         setUserData(response.data);
+        console.log('респонс.дата', response.data)
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -47,8 +48,8 @@ const UserProfile: React.FC = () => {
     <div className="container">
       {userData ? (
         <div className="section">
-          <p>Имя: {userData.firstname || 'N/A'}</p>
-          <p>Фамилия: {userData.lastname || 'N/A'}</p>
+          <p>Имя: {userData.firstName || 'N/A'}</p>
+          <p>Фамилия: {userData.lastName || 'N/A'}</p>
           <p>Email: {userData.email || 'N/A'}</p>
           <p>Тел.: {userData.phone}</p>
           {/* Дополнительные данные профиля */}

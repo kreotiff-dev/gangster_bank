@@ -9,7 +9,7 @@ import { NavigateFunction } from 'react-router-dom';
 export default class Store {
     user = {} as IUser;
     isAuth = false;
-    isLoading = false;
+    isLoading = true;
     isAuthChecked = false;
 
     constructor() {
@@ -22,7 +22,7 @@ export default class Store {
 
     setUser(user:IUser) {
         this.user = user;
-        console.log('User set:', user); // Логирование данных пользователя
+        console.log('User set:', user);
     }
 
     setLoading(bool: boolean) {
@@ -36,8 +36,8 @@ export default class Store {
     async login(phone: string, email: string, password: string, navigate: NavigateFunction): Promise<void>  {
         try {
             const response = await AuthService.login(phone, email, password);
-            console.log('Login response:', response); // Логирование ответа сервера
-            console.log('Login access token:', response.data.accessToken); // Логирование accessToken
+            console.log('Login response:', response);
+            console.log('Login access token:', response.data.accessToken);
             localStorage.setItem('token', response.data.accessToken);
             this.setAuth(true);
             this.setUser(response.data.user);
@@ -55,7 +55,7 @@ export default class Store {
     async registration(phone: string, email: string, password: string): Promise<void> {
         try {
             const response = await AuthService.registration(phone, email, password);
-            console.log('Registration response:', response); // Логирование ответа сервера
+            console.log('Registration response:', response);
             localStorage.setItem('token', response.data.accessToken);
             this.setAuth(true);
             this.setUser(response.data.user);
@@ -90,21 +90,23 @@ export default class Store {
 
     async checkAuth() {
         this.setLoading(true);
-        // logger.info('Checking authentication...');
+
         try {
             const response = await axios.get<AuthResponse>(`${API_URL}/auth/refresh`, { withCredentials: true });
-            // logger.info('Auth response:', response);
+            console.log('Перед установкой аксестокен в локалсторэдж', response.data.accessToken)
             localStorage.setItem('token', response.data.accessToken);
-            // logger.info('Access token saved to local storage');
+            console.log('Установленный аксестокен в локалсторэдж', localStorage.getItem('token'))
             this.setAuth(true);
+            console.log('setAuth:', this.setAuth)
             this.setUser(response.data.user);
-            // logger.info('User authenticated and set');
+            console.log('Данные пользователя после проверки аксестокена', response.data.user)
+
         } catch (error: unknown) {
-            // logger.error('CheckAuth error:', error);
+
             if (axios.isAxiosError(error)) {
-                // logger.error('Axios error message:', error.response?.data?.message);
+
             } else {
-                // logger.error('Unexpected error:', error);
+
             }
             this.setAuth(false);
         } finally {
