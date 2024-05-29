@@ -8,7 +8,7 @@ body {
 }
 
 .personalCabinet {
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Добавляем тень */
@@ -60,7 +60,7 @@ button:hover {
 
 /* Стили для footer */
 footer {
-  max-width: 1200px;
+  max-width: 800px;
   position: fixed;
   bottom: 0;
   width: 100%;
