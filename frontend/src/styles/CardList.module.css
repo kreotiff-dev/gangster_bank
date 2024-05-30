@@ -47,8 +47,45 @@
   cursor: pointer; 
 }
 
+.cardContent {
+  position: relative;
+  text-align: center;
+}
+
+.cardImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.cardNumber {
+  position: absolute;
+  top: 50%;
+  left: 38%;
+  transform: translate(-45%, -40%);
+  color: white;
+  font-size: 1.2em;
+}
+
+.cardExpiration {
+  position: absolute;
+  top: 73%;
+  left: 40%;
+  transform: translate(-50%, -55%);
+  color: white;
+  font-size: 0.8em;
+}
+
+.cardholderName {
+  position: absolute;
+  top: 80%;
+  left: 33%;
+  transform: translate(-50%, -50%);
+}
+
 .cardInfo {
-  margin-top: 20px;
+  margin-top: 10px;
   font-size: 16px;
   color: #666;
 }
