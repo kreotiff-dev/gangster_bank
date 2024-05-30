@@ -3,8 +3,10 @@ import { FaChevronLeft, FaChevronRight, FaPlus } from 'react-icons/fa';
 import styles from '../styles/CardList.module.css';
 import { fetchUserCards } from '../api/cards';
 import { Context } from '../index';
+import TransactionList from './TransactionList';
 
 interface Card {
+  id: number;
   cardNumber: string;
   cardType: string;
   cardBalance: number;
@@ -29,6 +31,8 @@ const CardsList: React.FC = () => {
   const [cards, setCards] = useState<Card[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [showDetails, setShowDetails] = useState(false);
+  const [showTransactions, setShowTransactions] = useState(false);
   const { store } = useContext(Context);
   const carouselRef = useRef<HTMLDivElement | null>(null);
 
@@ -63,6 +67,8 @@ const CardsList: React.FC = () => {
 
   const handleCardChange = (index: number) => {
     setActiveIndex(index);
+    setShowDetails(false);
+    setShowTransactions(false);
     if (carouselRef.current) {
       const carouselElement = carouselRef.current;
       const firstChild = carouselElement.firstChild as HTMLElement;
@@ -84,6 +90,20 @@ const CardsList: React.FC = () => {
       const carouselElement = carouselRef.current;
       carouselElement.scrollLeft += e.deltaY;
     }
+  };
+
+  const toggleDetails = () => {
+    setShowDetails(!showDetails);
+    setShowTransactions(false);
+  };
+
+  const navigateToForm = () => {
+    console.log('Navigate to form');
+  };
+
+  const showTransactionHistory = () => {
+    setShowTransactions(true);
+    setShowDetails(false);
   };
 
   if (loading) {
@@ -125,10 +145,28 @@ const CardsList: React.FC = () => {
       </div>
       {cards[activeIndex] && (
         <div className={styles.activeCardInfo}>
+          <div className={styles.cardActions}>
+            <button onClick={toggleDetails} className={styles.actionButton}>
+              О карте
+            </button>
+            <button onClick={navigateToForm} className={styles.actionButton}>
+              Пополнить
+            </button>
+            <button onClick={showTransactionHistory} className={styles.actionButton}>
+              История
+            </button>
+          </div>
+        </div>
+      )}
+      {showDetails && (
+        <div className={styles.cardDetails}>
           <div>Номер карты: {cards[activeIndex].cardNumber}</div>
           <div>Тип: {cards[activeIndex].cardType}</div>
           <div>Баланс: {currencyPositions[cards[activeIndex].currency] === 'before' ? `${currencySymbols[cards[activeIndex].currency]}${cards[activeIndex].cardBalance}` : `${cards[activeIndex].cardBalance}${currencySymbols[cards[activeIndex].currency]}`}</div>
         </div>
+      )}
+      {showTransactions && (
+        <TransactionList cardId={cards[activeIndex].id} />
       )}
     </div>
   );
