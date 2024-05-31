@@ -15,7 +15,9 @@ const config = {
     RABBITMQ_HOST: process.env.RABBITMQ_HOST,
     RABBITMQ_PORT: process.env.RABBITMQ_PORT,
     RABBITMQ_USER: process.env.RABBITMQ_USER,
-    RABBITMQ_PASSWORD: process.env.RABBITMQ_PASSWORD
+    RABBITMQ_PASSWORD: process.env.RABBITMQ_PASSWORD,
+    API_URL: process.env.DEV_API_URL,
+    CLIENT_URL: process.env.DEV_CLIENT_URL
   },
   test: {
     username: process.env.TEST_DB_USER,
@@ -39,7 +41,10 @@ const config = {
     RABBITMQ_HOST: process.env.RABBITMQ_HOST,
     RABBITMQ_PORT: process.env.RABBITMQ_PORT,
     RABBITMQ_USER: process.env.RABBITMQ_USER,
-    RABBITMQ_PASSWORD: process.env.RABBITMQ_PASSWORD
+    RABBITMQ_PASSWORD: process.env.RABBITMQ_PASSWORD,
+    API_URL: process.env.PROD_API_URL,
+    CLIENT_URL: process.env.PROD_CLIENT_URL
+
   }
 };
 

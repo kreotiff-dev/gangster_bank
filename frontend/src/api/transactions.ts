@@ -1,9 +1,8 @@
-// src/api/transactions.ts
-
 import axios from 'axios';
+const apiUrl = process.env.REACT_APP_API_URL;
 
 export const fetchCardTransactions = async (cardId: number) => {
-    const response = await axios.get(`http://localhost:3000/api/cards/${cardId}/transactions`, {
+    const response = await axios.get(`${apiUrl}/api/cards/${cardId}/transactions`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`

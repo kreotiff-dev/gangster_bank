@@ -1,4 +1,5 @@
 require('dotenv').config();
+const config = require('./config/config') 
 const express = require('express');
 const { sequelize } = require('./models');
 const cors = require('cors');
@@ -15,7 +16,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
     credentials: true,
-    origin: process.env.CLIENT_URL,
+    origin: config.CLIENT_URL,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));

@@ -25,7 +25,7 @@ const RegistrationForm: FC<RegistrationFormProps> = ({ onRegister, closeForm }) 
       return;
     }
     try {
-      await store.registration(phone, email, password);
+      await store.registration(phone, email, firstName, lastName, password);
       if (store.isAuth) {
         onRegister(phone);
         closeForm();
