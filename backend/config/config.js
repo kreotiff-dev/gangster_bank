@@ -42,6 +42,8 @@ const config = {
     RABBITMQ_PORT: process.env.RABBITMQ_PORT,
     RABBITMQ_USER: process.env.RABBITMQ_USER,
     RABBITMQ_PASSWORD: process.env.RABBITMQ_PASSWORD,
+    JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
+    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
     API_URL: process.env.PROD_API_URL,
     CLIENT_URL: process.env.PROD_CLIENT_URL
 
