@@ -1,3 +1,4 @@
+const { where } = require('sequelize');
 const { Card } = require('../models');
 
 // Получение списка всех карт
@@ -82,3 +83,20 @@ exports.reissueCard = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+
+// Баланс по всем картам по userID
+exports.getCardsBalance = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const cards = await Card.findAll({ where: { userId } });
+    if (!cards || cards.length === 0) {
+      return res.status(404).json({ message: 'Карты не найдены' });
+    }
+    const balances = cards.map(card => ({ balance: card.cardBalance }));
+    res.json(balances);
+  } catch (error) {
+    console.error('Error fetching card balances:', error);
+    res.status(500).json({ message: 'Внутренняя ошибка сервера' });
+  }
+}
+
