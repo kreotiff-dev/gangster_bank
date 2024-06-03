@@ -37,13 +37,15 @@ jobs:
           echo "{\"version\": \"$VERSION\", \"build\": \"$BUILD\"}" > version.json
 
       - name: Commit changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd backend
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add version.json package.json package-lock.json
           git commit -m "Backend: Bump version to $VERSION, Build $BUILD"
-          git push origin HEAD:main
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/kreotiff-dev/gangster_bank.git HEAD:main
 
       - name: Add SSH key
         uses: webfactory/ssh-agent@v0.5.3
@@ -56,6 +58,6 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh deploy@37.46.129.245 "cd /var/www/gbank/backend && git pull && npm install && NODE_ENV=production pm2 start index.js --name gbank_back
+          ssh deploy@37.46.129.245 "cd /var/www/gbank/backend && git pull && npm install && NODE_ENV=production pm2 start index.js --name gbank_back"
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
