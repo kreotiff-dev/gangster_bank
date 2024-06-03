@@ -18,7 +18,6 @@ const UserProfile: React.FC = () => {
   const { store } = useContext(Context);
 
   useEffect(() => {
-    console.log('User from store:', store.user); // Логирование данных пользователя
 
     if (!store.user || !store.user.id) {
       console.error('User ID is missing');
@@ -37,7 +36,6 @@ const UserProfile: React.FC = () => {
           throw new Error('Network response was not ok');
         }
         setUserData(response.data);
-        console.log('респонс.дата', response.data)
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
