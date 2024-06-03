@@ -60,4 +60,11 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh deploy@37.46.129.245 "cd /var/www/gbank/frontend && git pull && npm install && npm run build && pm2 start npx --name 'gbank_react' -- serve -s build -l 3001"
+          ssh deploy@37.46.129.245 "
+            source ~/.nvm/nvm.sh && \
+            cd /var/www/gbank/frontend && \
+            git reset --hard HEAD && \
+            git pull && \
+            npm install && \
+            npm run build && \
+            pm2 start npx --name 'gbank_react' -- serve -s build -l 3001 -f"
