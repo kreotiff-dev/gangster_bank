@@ -1,13 +1,14 @@
-name: Frontend CI/CD
+name: Deploy Frontend
 
 on:
   push:
+    branches:
+      - main
     paths:
       - 'frontend/**'
-  workflow_dispatch:
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,13 +22,13 @@ jobs:
 
     - name: Install dependencies
       run: |
+        sudo apt-get install -y jq
         cd frontend
         npm install
 
-    - name: Bump version and build
+    - name: Build project
       run: |
         cd frontend
-        npm version patch --no-git-tag-version
         npm run build
 
     - name: Update version file
@@ -48,5 +49,6 @@ jobs:
 
     - name: Deploy to server
       run: |
-        # Add your deployment commands here
-        echo "Deploying frontend..."
+        ssh user@your-server "cd /path/to/your/app/frontend && git pull && npm install && npm run build && pm2 start npx --name 'gbank_react' -- serve -s build -l 3001"
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
