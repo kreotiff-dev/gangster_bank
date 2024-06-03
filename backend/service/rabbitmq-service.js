@@ -21,7 +21,6 @@ class RabbitMQService {
         }
     }
 
-    // Методы для отправки сообщений через RabbitMQ
 }
 
 module.exports = new RabbitMQService();
