@@ -66,16 +66,13 @@ export default class Store {
         console.log('Logout function called');
         try {
             const response = await AuthService.logout();
-            console.log('Logout response:', response);
             localStorage.removeItem('token');
             this.setAuth(false);
             this.setUser({} as IUser);
-            console.log('Logout successful, navigating to /');
             navigate('/');
         } catch (error: unknown) {
             console.log('Logout error:', error);
             if (axios.isAxiosError(error)) {
-                console.log('Axios error message:', error?.response?.data?.message);
             } else {
                 console.error('Произошла непредвиденная ошибка', error);
             }
