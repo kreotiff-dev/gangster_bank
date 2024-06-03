@@ -2,6 +2,8 @@ name: Backend CI/CD
 
 on:
   push:
+    branches:
+      - main
     paths:
       - "backend/**"
   workflow_dispatch:
@@ -66,6 +68,8 @@ jobs:
             git reset --hard HEAD && \
             git pull && \
             npm install && \
-            NODE_ENV=production pm2 start index.js --name gbank_back -f"
+            pm2 stop gbank_back || true && \
+            pm2 delete gbank_back || true && \
+            NODE_ENV=production pm2 start index.js --name gbank_back"
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
