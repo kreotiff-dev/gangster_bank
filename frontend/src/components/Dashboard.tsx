@@ -1,10 +1,14 @@
 import React from 'react';
 import styles from '../styles/Dashboard.module.css';
+import UserProfile from './UserProfile';
 
 const Dashboard: React.FC = () => {
   return (
     <div className={styles.dashBoard}>
       <div className={styles.balanceInfo}>
+      <div className={styles.info}>
+        <UserProfile />
+        </div>
         <div className={styles.balance}>Ваш баланс: <br />250,000.00 ₽</div>
         <div className={styles.info}>
           <div className={styles.currentMonth}>Апрель 2023</div>

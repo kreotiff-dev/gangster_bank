@@ -1,3 +1,5 @@
+@import url('./UserProfile.module.css');
+
 .dashBoard {
   max-width: 1200px;
   margin: 0 auto;
@@ -9,48 +11,71 @@
 }
 
 .balanceInfo {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .balance {
-    font-size: 38px;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  .info {
-    display: flex;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch; /* Обеспечивает равную высоту элементов */
+  gap: 20px; /* Добавляет расстояние между элементами */
+}
+
+.balance, .info {
+  flex: 1; /* Элементы растягиваются равномерно */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); /* Легкая тень для визуального разделения */
+  text-align: center;
+}
+
+.balance {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.info {
+  flex: 1; /* Увеличивает ширину блока информации */
+}
+
+.currentMonth {
+  font-size: 18px;
+  font-weight: bold;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.infoItems {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.infoItem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  padding: 10px 20px;
+  width: 100%;
+}
+
+.infoContent {
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+}
+
+/* Медиа-запросы для адаптивности */
+@media (max-width: 768px) {
+  .balanceInfo {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
   }
-  
-  .currentMonth {
-    font-size: 18px;
-    font-weight: bold;
-    color: #666;
-    margin-bottom: 10px;
+  .balance, .info {
+    margin: 10px 0;
   }
-  
-  .infoItems {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-gap: 20px;
-    width: 100%;
-  }
-  
-  .infoItem {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    padding: 20px;
-  }
-  
-  .infoContent {
-    text-align: center;
-    font-size: 16px;
-    color: #666;
-  }
+}

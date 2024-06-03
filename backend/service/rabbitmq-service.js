@@ -1,5 +1,6 @@
 const amqp = require('amqplib');
 const logger = require('../utils/logger');
+const config = require('../config/config') 
 
 class RabbitMQService {
     constructor() {
@@ -8,7 +9,7 @@ class RabbitMQService {
 
     async connectToRabbitMQ() {
         try {
-            const connection = await amqp.connect('amqp://37.46.129.245:5672');
+            const connection = await amqp.connect(config.RABBITMQ_HOST);
             const channel = await connection.createChannel();
             logger.info('Connected to RabbitMQ');
 
