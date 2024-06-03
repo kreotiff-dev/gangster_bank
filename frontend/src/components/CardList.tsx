@@ -44,7 +44,7 @@ const getCardImage = (cardType: string) => {
     case 'MasterCard':
       return '/images/masterCard.png';
     case 'Visa':
-      return '/images/visa.png';
+      return '/images/visaCard.png';
     case 'МИР':
       return '/images/mirCard.png';
     case 'UnionPay':
