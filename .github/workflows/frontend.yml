@@ -1,4 +1,4 @@
-name: Deploy Frontend
+plname: Deploy Frontend
 
 on:
   push:
@@ -49,6 +49,6 @@ jobs:
 
     - name: Deploy to server
       run: |
-        ssh user@your-server "cd /path/to/your/app/frontend && git pull && npm install && npm run build && pm2 start npx --name 'gbank_react' -- serve -s build -l 3001"
+        ssh deploy@37.46.129.245 "cd /var/www/gbank/frontend && git pull && npm install && npm run build && pm2 start npx --name 'gbank_react' -- serve -s build -l 3001"
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
