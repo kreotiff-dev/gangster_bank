@@ -69,4 +69,4 @@ jobs:
             npm run build && \
             pm2 stop gbank_react || true && \
             pm2 delete gbank_react || true && \
-            pm2 start npx --name 'gbank_react' -- serve -s build -l 3001 -f"
+            pm2 start npx --name 'gbank_react' -- serve -s build -l 3001"
