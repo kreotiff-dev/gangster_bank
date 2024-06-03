@@ -1,0 +1,52 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    paths:
+      - 'frontend/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm install
+
+    - name: Bump version and build
+      run: |
+        cd frontend
+        npm version patch --no-git-tag-version
+        npm run build
+
+    - name: Update version file
+      run: |
+        cd frontend
+        VERSION=$(node -p "require('./package.json').version")
+        BUILD=$(($(jq -r '.build' version.json) + 1))
+        echo "{\"version\": \"$VERSION\", \"build\": \"$BUILD\"}" > version.json
+
+    - name: Commit changes
+      run: |
+        cd frontend
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add version.json package.json package-lock.json
+        git commit -m "Frontend: Bump version to $VERSION, Build $BUILD"
+        git push origin HEAD:main
+
+    - name: Deploy to server
+      run: |
+        # Add your deployment commands here
+        echo "Deploying frontend..."
