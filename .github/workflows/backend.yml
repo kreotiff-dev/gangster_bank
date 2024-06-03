@@ -47,5 +47,6 @@ jobs:
 
     - name: Deploy to server
       run: |
-        # Add your deployment commands here
-        echo "Deploying backend..."
+        ssh deploy@37.46.129.245 "cd /var/www/gbank/backend && git pull && npm install && NODE_ENV=production pm2 start index.js --name gbank_back
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
