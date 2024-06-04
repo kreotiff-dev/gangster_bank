@@ -14,6 +14,10 @@ interface Card {
   expirationDate: string;
   cardholderFirstname: string;
   cardholderLastname: string;
+  cardStatus: string;
+  cvv: string;
+  cardCategory: string;
+  cardLimit: string;
 }
 
 const currencySymbols: { [key: string]: string } = {
@@ -161,11 +165,7 @@ const CardsList: React.FC = () => {
                 <img src={getCardImage(card.cardType)} alt={card.cardType} className={styles.cardImage} />
                 <h3 className={styles.cardNumber}>{formatCardNumber(card.cardNumber)}</h3>
                 <div className={styles.cardExpiration}>{formatExpirationDate(card.expirationDate)}</div>
-                <div className={styles.cardholderName}>{card.cardholderFirstname.toUpperCase()} {card.cardholderLastname.toUpperCase()}</div>
-              </div>
-              <div className={styles.cardInfo}>
-                <div>Тип: {card.cardType}</div>
-                <div>Баланс: {currencyPositions[card.currency] === 'before' ? `${currencySymbols[card.currency]}${card.cardBalance}` : `${card.cardBalance}${currencySymbols[card.currency]}`}</div>
+                {/* <div className={styles.cardholderName}>{card.cardholderFirstname.toUpperCase()} {card.cardholderLastname.toUpperCase()}</div> */}
               </div>
             </div>
           ))}
@@ -195,6 +195,11 @@ const CardsList: React.FC = () => {
           <div>Номер карты: {formatCardNumber(cards[activeIndex].cardNumber)}</div>
           <div>Тип: {cards[activeIndex].cardType}</div>
           <div>Баланс: {currencyPositions[cards[activeIndex].currency] === 'before' ? `${currencySymbols[cards[activeIndex].currency]}${cards[activeIndex].cardBalance}` : `${cards[activeIndex].cardBalance}${currencySymbols[cards[activeIndex].currency]}`}</div>
+          <div>Имя: {cards[activeIndex].cardholderFirstname.toUpperCase()} {cards[activeIndex].cardholderLastname.toUpperCase()}</div>
+          <div>Статус: {cards[activeIndex].cardStatus} </div>
+          <div>CVV: {cards[activeIndex].cvv} </div>
+          <div>Категория: {cards[activeIndex].cardCategory} </div>
+          <div>Лимит: {cards[activeIndex].cardLimit} </div>
         </div>
       )}
       {showTransactions && (
