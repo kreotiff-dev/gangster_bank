@@ -1,22 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import styles from '../styles/Dashboard.module.css';
 import UserProfile from './UserProfile';
+import { fetchCardsBalance } from '../api/cards';
+import { Context } from '../index';
+import { API_URL } from "../http";
 
 const Dashboard: React.FC = () => {
   const [balance, setBalance] = useState<number | null>(null);
   const [exchangeRates, setExchangeRates] = useState<any>(null);
+  const { store } = useContext(Context);
 
   useEffect(() => {
     const fetchExchangeRates = async () => {
       try {
-        const response = await axios.get('/api/exchange-rates', {
+        const response = await axios.get(`${API_URL}/exchange-rates`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }
         });
-        console.log('Exchange rates:', response.data.Valute); // Отладочное сообщение
+        // console.log('Exchange rates:', response.data.Valute); // Отладочное сообщение
         setExchangeRates(response.data.Valute);
       } catch (error) {
         console.error('Error fetching exchange rates:', error);
@@ -29,18 +33,11 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchBalance = async () => {
       try {
-        const response = await axios.get('/api/cards/balance', {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
+        const cardsBalance = await fetchCardsBalance(store.user.id)
 
-        console.log('Card balances:', response.data); // Отладочное сообщение
-
-        if (Array.isArray(response.data) && exchangeRates) {
+        if (Array.isArray(cardsBalance) && exchangeRates) {
           const baseCurrency = 'RUB';
-          const totalBalance = response.data.reduce((acc: number, card: { balance: string; currency: string }) => {
+          const totalBalance = cardsBalance.reduce((acc: number, card: { balance: string; currency: string }) => {
             const cardBalance = parseFloat(card.balance);
             const cardCurrency = card.currency;
 
@@ -57,13 +54,13 @@ const Dashboard: React.FC = () => {
 
             const convertedBalance = cardCurrency === baseCurrency ? cardBalance : (cardBalance * rate) / baseRate;
 
-            console.log(`Card Balance: ${cardBalance}, Card Currency: ${cardCurrency}, Rate: ${rate}, Base Rate: ${baseRate}, Converted Balance: ${convertedBalance}`); // Отладочное сообщение
+            // console.log(`Card Balance: ${cardBalance}, Card Currency: ${cardCurrency}, Rate: ${rate}, Base Rate: ${baseRate}, Converted Balance: ${convertedBalance}`); // Отладочное сообщение
 
             return acc + convertedBalance;
           }, 0);
           setBalance(totalBalance);
         } else {
-          console.error('Unexpected response data:', response.data);
+          console.error('Unexpected response data:', cardsBalance);
         }
       } catch (error) {
         console.error('Error fetching balance:', error);
@@ -73,7 +70,7 @@ const Dashboard: React.FC = () => {
     if (exchangeRates) {
       fetchBalance();
     }
-  }, [exchangeRates]);
+  }, [exchangeRates, store.user.id]);
 
   return (
     <div className={styles.dashBoard}>
