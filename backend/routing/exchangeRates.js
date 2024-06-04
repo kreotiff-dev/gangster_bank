@@ -5,7 +5,11 @@ const router = express.Router();
 const config = require('../config/config')
 
 router.get('/exchange-rates', (req, res) => {
+  console.log('Путь к файлу курса валют:', config.CBR_FILE_PATH);
+  
   const filePath = path.join(config.CBR_FILE_PATH, 'daily_json.js');
+
+  console.log('Сформированный путь к файлу:', filePath);
   
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
