@@ -92,7 +92,7 @@ exports.getCardsBalance = async (req, res) => {
     if (!cards || cards.length === 0) {
       return res.status(404).json({ message: 'Карты не найдены' });
     }
-    const balances = cards.map(card => ({ balance: card.cardBalance }));
+    const balances = cards.map(card => ({ balance: card.cardBalance, currency: card.currency }));
     res.json(balances);
   } catch (error) {
     console.error('Error fetching card balances:', error);

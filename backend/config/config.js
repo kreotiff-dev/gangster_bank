@@ -17,7 +17,8 @@ const config = {
     RABBITMQ_USER: process.env.RABBITMQ_USER,
     RABBITMQ_PASSWORD: process.env.RABBITMQ_PASSWORD,
     API_URL: process.env.DEV_API_URL,
-    CLIENT_URL: process.env.DEV_CLIENT_URL
+    CLIENT_URL: process.env.DEV_CLIENT_URL,
+    CBR_FILE_PATH: process.env.DEV_CBR_FILE_PATH
   },
   test: {
     username: process.env.TEST_DB_USER,
@@ -29,7 +30,8 @@ const config = {
     RABBITMQ_HOST: process.env.RABBITMQ_HOST,
     RABBITMQ_PORT: process.env.RABBITMQ_PORT,
     RABBITMQ_USER: process.env.RABBITMQ_USER,
-    RABBITMQ_PASSWORD: process.env.RABBITMQ_PASSWORD
+    RABBITMQ_PASSWORD: process.env.RABBITMQ_PASSWORD,
+    CBR_FILE_PATH: process.env.TEST_CBR_FILE_PATH
   },
   production: {
     username: process.env.PROD_DB_USER,
@@ -45,7 +47,8 @@ const config = {
     JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
     JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
     API_URL: process.env.PROD_API_URL,
-    CLIENT_URL: process.env.PROD_CLIENT_URL
+    CLIENT_URL: process.env.PROD_CLIENT_URL,
+    CBR_FILE_PATH: process.env.PROD_CBR_FILE_PATH
 
   }
 };
