@@ -34,7 +34,7 @@ const Dashboard: React.FC = () => {
     const fetchBalance = async () => {
       try {
         const cardsBalance = await fetchCardsBalance(store.user.id)
-
+        // console.log('Cards balance:', cardsBalance); // Отладочное сообщение
         if (Array.isArray(cardsBalance) && exchangeRates) {
           const baseCurrency = 'RUB';
           const totalBalance = cardsBalance.reduce((acc: number, card: { balance: string; currency: string }) => {

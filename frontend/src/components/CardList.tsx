@@ -167,6 +167,7 @@ const CardsList: React.FC = () => {
                 <div className={styles.cardExpiration}>{formatExpirationDate(card.expirationDate)}</div>
                 {/* <div className={styles.cardholderName}>{card.cardholderFirstname.toUpperCase()} {card.cardholderLastname.toUpperCase()}</div> */}
               </div>
+              <div className={styles.activeCardInfo}> {currencyPositions[card.currency] === 'before' ? `${currencySymbols[card.currency]}${card.cardBalance}` : `${card.cardBalance}${currencySymbols[card.currency]}`} </div>
             </div>
           ))}
           <div className={styles.cardItem} onClick={() => console.log('Заказать карту')}>
@@ -190,7 +191,7 @@ const CardsList: React.FC = () => {
           </div>
         </div>
       )}
-      {showDetails && (
+      {showDetails && cards[activeIndex] && (
         <div className={styles.cardDetails}>
           <div>Номер карты: {formatCardNumber(cards[activeIndex].cardNumber)}</div>
           <div>Тип: {cards[activeIndex].cardType}</div>
@@ -202,7 +203,7 @@ const CardsList: React.FC = () => {
           <div>Лимит: {cards[activeIndex].cardLimit} </div>
         </div>
       )}
-      {showTransactions && (
+      {showTransactions && cards[activeIndex] && (
         <TransactionList cardId={cards[activeIndex].id} />
       )}
     </div>

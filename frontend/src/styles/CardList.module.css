@@ -94,9 +94,9 @@
 
 .activeCardInfo {
   margin-top: 20px;
-  font-size: 14px;
+  font-size: 18px;
   color: #333;
-  text-align: left;
+  text-align: center;
 }
 
 .orderCardText {
