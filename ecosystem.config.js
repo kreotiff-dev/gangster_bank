@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'gbank_back',
-      script: './backend/index.js',
+      script: './index.js',
       cwd: '/var/www/gbank/backend',
       instances: 1,
       autorestart: true,
