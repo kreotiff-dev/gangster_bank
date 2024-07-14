@@ -8,47 +8,54 @@ const config = require('../config/config')
 const { connectRedis } = require('../config/redisClient');
 
 class UserController {
-  // Отправка запроса на код подтверждения
-  sendCodeRequest = async (messageData) => {
-    try {
-      const connection = await amqp.connect({
-        hostname: config.RABBITMQ_HOST,
-        port: config.RABBITMQ_PORT,
-        username: config.RABBITMQ_USER,
-        password: config.RABBITMQ_PASSWORD
-      });
-      const channel = await connection.createChannel();
-      await channel.assertQueue('code_requests');
-      channel.sendToQueue('code_requests', Buffer.from(JSON.stringify(messageData)));
-      logger.info(`Code request sent for user ID: ${messageData.userId}`);
-    } catch (e) {
-      logger.error(`Error sending code request: ${e.message}`);
-    }
-  }
-
-  // Регистрация пользователя
-  registration = async (req, res, next) => {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        logger.error('Validation error:', errors.array());
-        return next(ApiError.BadRequest('Ошибка при валидации', errors.array()));
+    // Отправка запроса на код подтверждения
+    sendCodeRequest = async (userId, phoneNumber, appId) => {
+      try {
+        const messageData = {
+          user_id: userId,
+          app_id: appId, // Добавляем appId в messageData
+          user_phone: phoneNumber,
+        };
+  
+        const connection = await amqp.connect({
+          hostname: config.RABBITMQ_HOST,
+          port: config.RABBITMQ_PORT,
+          username: config.RABBITMQ_USER,
+          password: config.RABBITMQ_PASSWORD
+        });
+        const channel = await connection.createChannel();
+        await channel.assertQueue('code_requests');
+        channel.sendToQueue('code_requests', Buffer.from(JSON.stringify(messageData)));
+        logger.info(`Code request sent for user ID: ${messageData.user_id}`);
+      } catch (e) {
+        logger.error(`Error sending code request: ${e.message}`);
       }
-      const { phone, email, password, firstName, lastName } = req.body;
-      console.log(req.body);  // Debugging line to check if data is received
-      const userData = await userService.registration(phone, email, password, firstName, lastName);
-
-      await this.sendCodeRequest({ userId: userData.user.id, phone }); //можно заложить дефект userId: userData.id - тогда не будет записываться в БД код
-
-      res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
-      logger.info(`User registered: ${JSON.stringify(userData)}`);
-      return res.json(userData);
-
-    } catch (e) {
-      logger.error(`Error in registration: ${e.message}`);
-      next(e);
     }
-  }
+  
+    // Регистрация пользователя
+    registration = async (req, res, next) => {
+      try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          logger.error('Validation error:', errors.array());
+          return next(ApiError.BadRequest('Ошибка при валидации', errors.array()));
+        }
+        const { phone, email, password, firstName, lastName } = req.body;
+        console.log(req.body);  // Debugging line to check if data is received
+        const userData = await userService.registration(phone, email, password, firstName, lastName);
+  
+        // Передаем параметры отдельно, а не как один объект
+        await this.sendCodeRequest(userData.user.id, phone, 'gbank_reg_code'); 
+  
+        res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+        logger.info(`User registered: ${JSON.stringify(userData)}`);
+        return res.json(userData);
+  
+      } catch (e) {
+        logger.error(`Error in registration: ${e.message}`);
+        next(e);
+      }
+    }
 
   // Авторизация пользователя
   login = async (req, res, next) => {
