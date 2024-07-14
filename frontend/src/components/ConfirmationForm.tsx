@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../styles/ConfirmationForm.module.css'
 
+const apiUrl = process.env.REACT_APP_API_URL;
 interface ConfirmationFormProps {
   phoneNumber: string;
   closeForm: () => void;
@@ -19,7 +20,7 @@ const ConfirmationForm: React.FC<ConfirmationFormProps> = ({ phoneNumber, closeF
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      const response = await fetch('http://localhost:3000/api/auth/confirm', {
+      const response = await fetch(`${apiUrl}/api/auth/confirm`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

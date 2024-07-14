@@ -4,6 +4,7 @@ const authRoutes = require('./authRoutes');
 const userRoutes = require('./userRoutes');
 const cardRoutes = require('./cardRoutes')
 const transactionRoutes = require('./transactionRoutes');
+const exchangeRatesRouter = require('./exchangeRates')
 
 // маршруты аутентификации
 router.use('/auth', authRoutes);
@@ -16,5 +17,7 @@ router.use('/cards', cardRoutes);
 
 // транзакции по картам
 router.use('/', transactionRoutes)
+
+router.use('/', exchangeRatesRouter);
 
 module.exports = router;

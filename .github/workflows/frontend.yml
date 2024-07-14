@@ -1,0 +1,72 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y jq
+          cd frontend
+          npm install
+
+      - name: Build project
+        run: |
+          cd frontend
+          CI=false npm run build
+
+      - name: Update version file
+        run: |
+          cd frontend
+          VERSION=$(node -p "require('./package.json').version")
+          BUILD=$(($(jq -r '.build' version.json) + 1))
+          echo "{\"version\": \"$VERSION\", \"build\": \"$BUILD\"}" > version.json
+
+      - name: Commit changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd frontend
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add version.json package.json package-lock.json
+          git commit -m "Frontend: Bump version to $VERSION, Build $BUILD"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/kreotiff-dev/gangster_bank.git HEAD:main
+
+      - name: Add SSH key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Verify SSH key
+        run: |
+          ssh -o StrictHostKeyChecking=no deploy@37.46.129.245 "echo 'SSH Key is working'"
+
+      - name: Deploy to server
+        run: |
+          ssh deploy@37.46.129.245 "
+            source ~/.nvm/nvm.sh && \
+            cd /var/www/gbank/frontend && \
+            git reset --hard HEAD && \
+            git pull && \
+            npm install && \
+            npm run build && \
+            pm2 stop gbank_react || true && \
+            pm2 delete gbank_react || true && \
+            pm2 start npx --name 'gbank_react' -- serve -s build -l 3001"

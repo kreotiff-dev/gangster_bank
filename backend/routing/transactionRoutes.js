@@ -1,7 +1,7 @@
 const express = require('express');
 const { getTransactionsByCardId } = require('../controllers/transactionController');
 const router = express.Router();
-const authMiddleware = require('..//middlewares/auth-middleware');
+const authMiddleware = require('../middlewares/auth-middleware');
 
 router.use(authMiddleware);
 

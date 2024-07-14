@@ -6,9 +6,8 @@ export interface User {
     id: string;
     phone: string;
     email: string;
-    firstname: string;
-    lastname: string;
-    // Добавьте дополнительные поля по необходимости
+    firstName: string;
+    lastName: string;
 }
 
 export default class AuthService {
@@ -16,8 +15,8 @@ export default class AuthService {
         return $api.post<AuthResponse>('/auth/login', {phone, email, password})
     }
 
-    static async registration(phone: string, email: string, password: string): Promise<AxiosResponse<AuthResponse>> {
-        return $api.post<AuthResponse>('/auth/registration', {phone, email, password})
+    static async registration(phone: string, email: string, lastName: string, firstName: string, password: string): Promise<AxiosResponse<AuthResponse>> {
+        return $api.post<AuthResponse>('/auth/registration', {phone, email, lastName, firstName, password})
     }
 
     static async logout(): Promise<void> {
