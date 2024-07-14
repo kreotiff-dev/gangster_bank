@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { Context } from '../index';
 
+const apiUrl = process.env.REACT_APP_API_URL;
+
 interface User {
   id: string;
   firstName: string;
@@ -25,7 +27,7 @@ const UserProfile: React.FC = () => {
 
     const fetchUserData = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/users/${store.user.id}`, {
+        const response = await axios.get(`${apiUrl}/api/users/${store.user.id}`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`

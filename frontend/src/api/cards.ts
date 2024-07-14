@@ -1,7 +1,8 @@
 import axios from 'axios';
+const apiUrl = process.env.REACT_APP_API_URL;
 
 export const fetchUserCards = async (userId: string) => {
-  const response = await axios.get(`http://localhost:3000/api/cards/`, {
+  const response = await axios.get(`${apiUrl}/api/cards/`, {
     withCredentials: true,
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`
