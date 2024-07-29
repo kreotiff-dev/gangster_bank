@@ -75,7 +75,7 @@ exports.reissueCard = async (req, res) => {
     if (!card) {
       return res.status(404).send({ message: 'Card not found' });
     }
-    // Логика перевыпуска карты (например, установка нового статуса)
+    // Здесь будет логика перевыпуска карты
     card.cardStatus = 'Reissue requested';
     await card.save();
     res.json(card);

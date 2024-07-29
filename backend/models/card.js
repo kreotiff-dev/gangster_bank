@@ -77,7 +77,6 @@ module.exports = (sequelize, DataTypes) => {
     underscored: true,
   });
   Card.associate = function(models) {
-    // associations can be defined here
     Card.belongsTo(models.User, { foreignKey: 'userId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
   };
   return Card;
