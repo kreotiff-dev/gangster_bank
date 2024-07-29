@@ -8,12 +8,12 @@ const config = require('../config/config')
 const { connectRedis } = require('../config/redisClient');
 
 class UserController {
-    // Отправка запроса на код подтверждения
+    // запрос на код подтверждения
     sendCodeRequest = async (userId, phoneNumber, appId) => {
       try {
         const messageData = {
           user_id: userId,
-          app_id: appId, // Добавляем appId в messageData
+          app_id: appId,
           user_phone: phoneNumber,
         };
   

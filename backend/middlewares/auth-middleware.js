@@ -9,13 +9,13 @@ module.exports = async function (req, res, next) {
         
         if (!authorizationHeader) {
             logger.error('Authorization header missing');
-            return next(ApiError.UnauthError()); // Возвращаем ошибку, если заголовок отсутствует
+            return next(ApiError.UnauthError());
         }
 
         const accessToken = authorizationHeader.split(' ')[1];
         if (!accessToken) {
             logger.error('Access token missing');
-            return next(ApiError.UnauthError()); // Возвращаем ошибку, если токен отсутствует
+            return next(ApiError.UnauthError());
         }
 
         const client = await connectRedis();
