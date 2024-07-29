@@ -8,7 +8,7 @@ export interface User {
     email: string;
     firstName: string;
     lastName: string;
-    // Добавьте дополнительные поля по необходимости
+
 }
 
 export default class AuthService {
