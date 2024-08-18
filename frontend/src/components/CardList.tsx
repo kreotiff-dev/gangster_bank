@@ -24,14 +24,12 @@ const currencySymbols: { [key: string]: string } = {
   USD: '$',
   RUB: '₽',
   EUR: '€',
-
 };
 
 const currencyPositions: { [key: string]: 'before' | 'after' } = {
   USD: 'before',
   RUB: 'after',
   EUR: 'before',
-
 };
 
 const formatCardNumber = (cardNumber: string) => {
@@ -141,10 +139,6 @@ const CardsList: React.FC = () => {
     return <div>Loading...</div>;
   }
 
-  if (!cards.length) {
-    return <div>No cards available.</div>;
-  }
-
   return (
     <div className={styles.cardsList}>
       <div className={styles.cardsContainer}>
@@ -152,28 +146,36 @@ const CardsList: React.FC = () => {
         <button className={`${styles.navigationButton} ${styles.prevButton}`} onClick={() => handleScroll('prev')}><FaChevronLeft /></button>
         <button className={`${styles.navigationButton} ${styles.nextButton}`} onClick={() => handleScroll('next')}><FaChevronRight /></button>
         <div className={styles.cardCarousel} ref={carouselRef} onWheel={handleMouseWheel}>
-          {cards.map((card, index) => (
-            <div
-              key={index}
-              className={styles.cardItem}
-              onClick={() => handleCardChange(index)}
-              style={{
-                opacity: index === activeIndex ? 1 : 0.5
-              }}
-            >
-              <div className={styles.cardContent}>
-                <img src={getCardImage(card.cardType)} alt={card.cardType} className={styles.cardImage} />
-                <h3 className={styles.cardNumber}>{formatCardNumber(card.cardNumber)}</h3>
-                <div className={styles.cardExpiration}>{formatExpirationDate(card.expirationDate)}</div>
-                {/* <div className={styles.cardholderName}>{card.cardholderFirstname.toUpperCase()} {card.cardholderLastname.toUpperCase()}</div> */}
-              </div>
-              <div className={styles.activeCardInfo}> {currencyPositions[card.currency] === 'before' ? `${currencySymbols[card.currency]}${card.cardBalance}` : `${card.cardBalance}${currencySymbols[card.currency]}`} </div>
+          {cards.length === 0 ? (
+            <div className={styles.cardItem} onClick={() => console.log('Заказать карту')}>
+              <FaPlus size={48} />
+              <div className={styles.orderCardText}>Заказать карту</div>
             </div>
-          ))}
-          <div className={styles.cardItem} onClick={() => console.log('Заказать карту')}>
-            <FaPlus size={48} />
-            <div className={styles.orderCardText}>Заказать карту</div>
-          </div>
+          ) : (
+            cards.map((card, index) => (
+              <div
+                key={index}
+                className={styles.cardItem}
+                onClick={() => handleCardChange(index)}
+                style={{
+                  opacity: index === activeIndex ? 1 : 0.5
+                }}
+              >
+                <div className={styles.cardContent}>
+                  <img src={getCardImage(card.cardType)} alt={card.cardType} className={styles.cardImage} />
+                  <h3 className={styles.cardNumber}>{formatCardNumber(card.cardNumber)}</h3>
+                  <div className={styles.cardExpiration}>{formatExpirationDate(card.expirationDate)}</div>
+                </div>
+                <div className={styles.activeCardInfo}> {currencyPositions[card.currency] === 'before' ? `${currencySymbols[card.currency]}${card.cardBalance}` : `${card.cardBalance}${currencySymbols[card.currency]}`} </div>
+              </div>
+            ))
+          )}
+          {cards.length > 0 && (
+            <div className={styles.cardItem} onClick={() => console.log('Заказать карту')}>
+              <FaPlus size={48} />
+              <div className={styles.orderCardText}>Заказать карту</div>
+            </div>
+          )}
         </div>
       </div>
       {cards[activeIndex] && (
