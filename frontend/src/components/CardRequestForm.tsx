@@ -1,4 +1,5 @@
 import React, { useState, FormEvent } from 'react';
+import styles from '../styles/Modal.module.css';
 
 interface CardRequestFormState {
     cardType: 'МИР' | 'UnionPay' | 'Visa' | 'MasterCard';
@@ -53,7 +54,7 @@ const CardRequestForm: React.FC = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form className={styles.formCardRequest} onSubmit={handleSubmit}>
             <div>
                 <label htmlFor="cardType">Тип карты:</label>
                 <select 

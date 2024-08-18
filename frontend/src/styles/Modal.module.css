@@ -37,13 +37,13 @@
     color: #ff0000; /* цвет при наведении */
 }
 
-form {
+.formCardRequest {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-form div {
+.formCardRequest div {
     display: flex;
     flex-direction: column;
 }
@@ -77,14 +77,16 @@ input[type="radio"] {
 }
 
 button[type="submit"] {
-    background-color: #007bff;
+    display: inline-block;
+    margin: 10px;
+    padding: 12px 24px;
+    font-size: 18px;
+    text-decoration: none;
     color: #fff;
-    padding: 10px;
-    font-size: 16px;
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s;
 }
 
 button[type="submit"]:hover {
