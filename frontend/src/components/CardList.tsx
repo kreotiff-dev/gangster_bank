@@ -4,6 +4,8 @@ import styles from '../styles/CardList.module.css';
 import { fetchUserCards } from '../api/cards';
 import { Context } from '../index';
 import TransactionList from './TransactionList';
+import Modal from './Modal'; 
+import CardRequestForm from './CardRequestForm'; 
 
 interface Card {
   id: number;
@@ -56,12 +58,14 @@ const getCardImage = (cardType: string) => {
   }
 };
 
+
 const CardsList: React.FC = () => {
   const [cards, setCards] = useState<Card[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showDetails, setShowDetails] = useState(false);
   const [showTransactions, setShowTransactions] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false); 
   const { store } = useContext(Context);
   const carouselRef = useRef<HTMLDivElement | null>(null);
 
@@ -93,6 +97,14 @@ const CardsList: React.FC = () => {
       carouselElement.scrollLeft = activeIndex * cardWidth;
     }
   }, [activeIndex]);
+
+const openModal = () => {
+    setIsModalOpen(true);
+};
+
+const closeModal = () => {
+    setIsModalOpen(false);
+};
 
   const handleCardChange = (index: number) => {
     setActiveIndex(index);
@@ -147,7 +159,7 @@ const CardsList: React.FC = () => {
         <button className={`${styles.navigationButton} ${styles.nextButton}`} onClick={() => handleScroll('next')}><FaChevronRight /></button>
         <div className={styles.cardCarousel} ref={carouselRef} onWheel={handleMouseWheel}>
           {cards.length === 0 ? (
-            <div className={styles.cardItem} onClick={() => console.log('Заказать карту')}>
+            <div className={styles.cardItem} onClick={openModal}>
               <FaPlus size={48} />
               <div className={styles.orderCardText}>Заказать карту</div>
             </div>
@@ -171,7 +183,7 @@ const CardsList: React.FC = () => {
             ))
           )}
           {cards.length > 0 && (
-            <div className={styles.cardItem} onClick={() => console.log('Заказать карту')}>
+            <div className={styles.cardItem} onClick={openModal}>
               <FaPlus size={48} />
               <div className={styles.orderCardText}>Заказать карту</div>
             </div>
@@ -208,6 +220,10 @@ const CardsList: React.FC = () => {
       {showTransactions && cards[activeIndex] && (
         <TransactionList cardId={cards[activeIndex].id} />
       )}
+
+      <Modal isOpen={isModalOpen} onClose={closeModal}>
+        <CardRequestForm />
+      </Modal>
     </div>
   );
 };
