@@ -21,11 +21,12 @@ class UserController {
           hostname: config.RABBITMQ_HOST,
           port: config.RABBITMQ_PORT,
           username: config.RABBITMQ_USER,
-          password: config.RABBITMQ_PASSWORD
+          password: config.RABBITMQ_PASSWORD,
+          vhost: 'gbank'
         });
         const channel = await connection.createChannel();
-        await channel.assertQueue('code_requests');
-        channel.sendToQueue('code_requests', Buffer.from(JSON.stringify(messageData)));
+        await channel.assertQueue('verification_code_requests');
+        channel.sendToQueue('verification_code_requests', Buffer.from(JSON.stringify(messageData)));
         logger.info(`Code request sent for user ID: ${messageData.user_id}`);
       } catch (e) {
         logger.error(`Error sending code request: ${e.message}`);

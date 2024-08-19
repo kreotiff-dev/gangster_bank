@@ -1,6 +1,6 @@
 const amqp = require('amqplib');
 const logger = require('../utils/logger');
-const config = require('../config/config') 
+const config = require('../config/config');
 
 class RabbitMQService {
     constructor() {
@@ -9,19 +9,22 @@ class RabbitMQService {
 
     async connectToRabbitMQ() {
         try {
-            const connection = await amqp.connect(config.RABBITMQ_HOST);
+            const amqpUrl = `amqp://${config.RABBITMQ_USER}:${config.RABBITMQ_PASSWORD}@${config.RABBITMQ_HOST}:${config.RABBITMQ_PORT}/gbank`;
+            const connection = await amqp.connect(amqpUrl);
             const channel = await connection.createChannel();
             logger.info('Connected to RabbitMQ');
 
-            channel.consume('code_response', (msg) => {
-                logger.info(`Received message: ${msg.content.toString()}`);
-            }, { noAck: true });
+            await channel.assertQueue('verification_code_responses');
+            channel.consume('verification_code_responses', (msg) => {
+                if (msg !== null) {
+                    logger.info(`Received message: ${msg.content.toString()}`);
+                    channel.ack(msg);
+                }
+            }, { noAck: false });
         } catch (error) {
             logger.error(`Error connecting to RabbitMQ: ${error.message}`);
         }
     }
-
-    
 }
 
 module.exports = new RabbitMQService();

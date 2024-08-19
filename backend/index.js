@@ -10,6 +10,8 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 const errorMiddleware = require('./middlewares/error-middleware');
 const { connectRedis } = require('./config/redisClient');
+const RabbitMQService = require('./service/rabbitmq-service');
+
 
 // Middleware
 app.use(express.json());
