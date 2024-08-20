@@ -1,5 +1,6 @@
 import React, { useState, FormEvent } from 'react';
 import styles from '../styles/Modal.module.css';
+const apiUrl = process.env.REACT_APP_API_URL;
 
 interface CardRequestFormState {
     cardType: 'МИР' | 'UnionPay' | 'Visa' | 'MasterCard';
@@ -34,10 +35,11 @@ const CardRequestForm: React.FC = () => {
         }
 
         try {
-            const response = await fetch('/api/card-request', {
+            const response = await fetch(`${apiUrl}/api/cards/request`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
                 body: JSON.stringify(formState),
             });
