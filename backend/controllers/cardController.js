@@ -1,6 +1,9 @@
 const { where } = require('sequelize');
 const { Card } = require('../models');
 const UserDto = require('../dtos/user-dto');
+const logger = require('../utils/logger');
+const rabbitmq = require('../utils/rabbitmq');
+
 
 // Получение списка всех карт
 exports.getCards = async (req, res) => {
@@ -58,9 +61,11 @@ exports.requestNewCard = async (req, res) => {
   try {
       const user = new UserDto(req.user);
       const { cardType, cardCategory, cardBalance, currency } = req.body;
+      const appId = 'gbank';
 
       const messageData = {
           userId: user.id,
+          app_id: appId,
           cardType,
           cardCategory,
           cardBalance,
@@ -69,22 +74,9 @@ exports.requestNewCard = async (req, res) => {
           lastName: user.lastName
       };
 
-      const connection = await amqp.connect({
-          hostname: config.RABBITMQ_HOST,
-          port: config.RABBITMQ_PORT,
-          username: config.RABBITMQ_USER,
-          password: config.RABBITMQ_PASSWORD,
-          virtual_host: 'gbank'
-      });
-
-      const channel = await connection.createChannel();
-      await channel.assertQueue('card_application_requests');
-      channel.sendToQueue('card_application_requests', Buffer.from(JSON.stringify(messageData)));
+      await rabbitmq.sendToQueue('card_application_requests' ,messageData);
       
       logger.info(`Card request sent for user ID: ${req.user.id}`);
-
-      await channel.close();
-      await connection.close();
 
       res.status(200).json({ message: 'Card request sent successfully' });
   } catch (error) {

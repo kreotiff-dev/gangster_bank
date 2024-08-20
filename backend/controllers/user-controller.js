@@ -3,35 +3,24 @@ const authService = require('../service/auth-service');
 const { validationResult } = require('express-validator');
 const ApiError = require('../exceptions/api-error');
 const logger = require('../utils/logger');
-const amqp = require('amqplib');
-const config = require('../config/config')
 const { connectRedis } = require('../config/redisClient');
+const rabbitMQUtils = require('../utils/rabbitmq');
 
 class UserController {
     // запрос на код подтверждения
     sendCodeRequest = async (userId, phoneNumber, appId) => {
       try {
-        const messageData = {
-          user_id: userId,
-          app_id: appId,
-          user_phone: phoneNumber,
-        };
-  
-        const connection = await amqp.connect({
-          hostname: config.RABBITMQ_HOST,
-          port: config.RABBITMQ_PORT,
-          username: config.RABBITMQ_USER,
-          password: config.RABBITMQ_PASSWORD,
-          vhost: 'gbank'
-        });
-        const channel = await connection.createChannel();
-        await channel.assertQueue('verification_code_requests');
-        channel.sendToQueue('verification_code_requests', Buffer.from(JSON.stringify(messageData)));
-        logger.info(`Code request sent for user ID: ${messageData.user_id}`);
+          const messageData = {
+              user_id: userId,
+              app_id: appId,
+              user_phone: phoneNumber,
+          };
+          await rabbitMQUtils.sendToQueue('verification_code_requests', messageData);
+          logger.info(`Code request sent for user ID: ${messageData.user_id}`);
       } catch (e) {
-        logger.error(`Error sending code request: ${e.message}`);
+          logger.error(`Error sending code request: ${e.message}`);
       }
-    }
+  }
   
     // Регистрация пользователя
     registration = async (req, res, next) => {

@@ -1,5 +1,5 @@
 require('dotenv').config();
-const config = require('./config/config') 
+const config = require('./config/config');
 const express = require('express');
 const { sequelize } = require('./models');
 const cors = require('cors');
@@ -10,8 +10,8 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 const errorMiddleware = require('./middlewares/error-middleware');
 const { connectRedis } = require('./config/redisClient');
-const RabbitMQService = require('./service/rabbitmq-service');
-
+const rabbitMQService = require('./service/rabbitmq-service');
+const rabbitMQUtils = require('./utils/rabbitmq');
 
 // Middleware
 app.use(express.json());
@@ -32,12 +32,16 @@ const start = async () => {
         await sequelize.authenticate();
         logger.info('Connection has been established successfully.');
 
-
         await sequelize.sync();
-
 
         await connectRedis();
 
+        // Подключение к RabbitMQ
+        await rabbitMQUtils.connect();
+        logger.info('Connected to RabbitMQ via utils');
+
+        // Запускаем слушатель очереди
+        rabbitMQService;
 
         app.listen(PORT, () => {
             logger.info(`Server started on port ${PORT}`);
@@ -46,5 +50,9 @@ const start = async () => {
         logger.error(`Error starting the server: ${e.message}`);
     }
 };
+
+process.on('exit', async () => {
+    await rabbitMQUtils.closeConnection();
+});
 
 start();
