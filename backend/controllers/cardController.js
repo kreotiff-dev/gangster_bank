@@ -1,5 +1,6 @@
 const { where } = require('sequelize');
 const { Card } = require('../models');
+const { CardRequest } = require('../models');
 const UserDto = require('../dtos/user-dto');
 const logger = require('../utils/logger');
 const rabbitmq = require('../utils/rabbitmq');
@@ -59,29 +60,49 @@ exports.createCard = async (req, res) => {
 
 exports.requestNewCard = async (req, res) => {
   try {
-      const user = new UserDto(req.user);
-      const { cardType, cardCategory, cardBalance, currency } = req.body;
-      const appId = 'gbank';
+    const user = new UserDto(req.user);
+    const { cardType, cardCategory, cardBalance, currency } = req.body;
+    const appId = 'gbank';
 
-      const messageData = {
-          userId: user.id,
-          app_id: appId,
-          cardType,
-          cardCategory,
-          cardBalance,
-          currency,
-          firstName: user.firstName,
-          lastName: user.lastName
-      };
+    const cardRequest = await CardRequest.create({
+      userId: user.id,
+      app_id: appId,
+      phone: user.phone,
+      cardType,
+      cardCategory,
+      cardBalance,
+      currency,
+      cardholderFirstname: user.firstName,
+      cardholderLastname: user.lastName,
+      status: 'pending'
+    });
 
-      await rabbitmq.sendToQueue('card_application_requests' ,messageData);
-      
-      logger.info(`Card request sent for user ID: ${req.user.id}`);
+    const cardRequestId = cardRequest.id;
 
-      res.status(200).json({ message: 'Card request sent successfully' });
+    const messageData = {
+      userId: user.id,
+      app_id: appId,
+      phone: user.phone,
+      cardRequestId, 
+      cardType,
+      cardCategory,
+      cardBalance,
+      currency,
+      firstName: user.firstName,
+      lastName: user.lastName
+    };
+
+    logger.info(`Request body: ${JSON.stringify(req.body)}`);
+
+    // Отправка сообщения в очередь
+    await rabbitmq.sendToQueue('card_application_requests', messageData);
+
+    logger.info(`Card request sent for user ID: ${req.user.id} with request ID: ${cardRequestId}`);
+
+    res.status(200).json({ message: 'Card request sent successfully', cardRequestId });
   } catch (error) {
-      logger.error(`Error in card request: ${error.message}`);
-      res.status(500).json({ message: 'Internal Server Error' });
+    logger.error(`Error in card request: ${error.message}`);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
