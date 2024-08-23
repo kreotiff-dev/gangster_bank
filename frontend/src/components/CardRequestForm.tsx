@@ -6,7 +6,7 @@ interface CardRequestFormState {
     cardType: 'МИР' | 'UnionPay' | 'Visa' | 'MasterCard';
     cardCategory: 'Debit' | 'Credit';
     cardBalance: number;
-    cardCurrency: 'RUB' | 'EUR' | 'USD' | 'CNY';
+    currency: 'RUB' | 'EUR' | 'USD' | 'CNY';
 }
 
 const CardRequestForm: React.FC = () => {
@@ -14,7 +14,7 @@ const CardRequestForm: React.FC = () => {
         cardType: 'МИР', // Default value
         cardCategory: 'Debit',
         cardBalance: 0,
-        cardCurrency: 'RUB',
+        currency: 'RUB',
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -29,7 +29,7 @@ const CardRequestForm: React.FC = () => {
         e.preventDefault();
 
         // Validation (all fields must be filled)
-        if (!formState.cardType || !formState.cardCategory || formState.cardBalance <= 0 || !formState.cardCurrency) {
+        if (!formState.cardType || !formState.cardCategory || formState.cardBalance <= 0 || !formState.currency) {
             alert('Пожалуйста, заполните все поля.');
             return;
         }
@@ -112,11 +112,11 @@ const CardRequestForm: React.FC = () => {
             </div>
 
             <div>
-                <label htmlFor="cardCurrency">Валюта карты:</label>
+                <label htmlFor="currency">Валюта карты:</label>
                 <select 
-                    id="cardCurrency" 
-                    name="cardCurrency" 
-                    value={formState.cardCurrency} 
+                    id="currency" 
+                    name="currency" 
+                    value={formState.currency} 
                     onChange={handleInputChange} 
                     required
                 >
