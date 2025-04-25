@@ -2,11 +2,11 @@ module.exports = {
   apps: [
     {
       name: 'gbank_back',
-      script: './backend/index.js',
+      script: './index.js',
       cwd: '/var/www/gbank/backend',
       instances: 1,
       autorestart: true,
-      watch: true,
+      watch: false,
       max_memory_restart: '1G',
       env: {
         NODE_ENV: 'production'
@@ -19,7 +19,7 @@ module.exports = {
       cwd: '/var/www/gbank/frontend',
       instances: 1,
       autorestart: true,
-      watch: true,
+      watch: false,
       max_memory_restart: '1G',
       env: {
         NODE_ENV: 'production'

@@ -4,7 +4,6 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      // Define associations here
       User.hasMany(models.Token, { foreignKey: 'userId' });
     }
   }
@@ -16,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       unique: true,
       validate: {
         notEmpty: true,
-        is: /^[0-9+\-() ]+$/i, // Пример регулярного выражения для проверки номера телефона
+        is: /^[0-9+\-() ]+$/i,
       }
     },
     email: {
@@ -53,8 +52,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'User',
-    timestamps: true, // Automatically add createdAt and updatedAt
-    underscored: true, // Use snake_case for automatically added attributes
+    timestamps: true,
+    underscored: true,
   });
 
   return User;

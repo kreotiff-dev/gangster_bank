@@ -24,14 +24,14 @@ const currencySymbols: { [key: string]: string } = {
   USD: '$',
   RUB: '₽',
   EUR: '€',
-  // Добавьте другие валюты по мере необходимости
+
 };
 
 const currencyPositions: { [key: string]: 'before' | 'after' } = {
   USD: 'before',
   RUB: 'after',
   EUR: 'before',
-  // Добавьте другие валюты по мере необходимости
+
 };
 
 const formatCardNumber = (cardNumber: string) => {

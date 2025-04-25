@@ -17,8 +17,8 @@ class UserService {
         const userDto = new UserDto(user);
         const tokens = tokenService.generateTokens({ ...userDto });
 
-        console.log('Generated tokens in userService:', tokens); // Debugging line
-        console.log('Passing to saveToken:', userDto.id, tokens.refreshToken); // Debugging line
+        console.log('Generated tokens in userService:', tokens);
+        console.log('Passing to saveToken:', userDto.id, tokens.refreshToken);
 
         await tokenService.saveToken(userDto.id, tokens.refreshToken);
 
@@ -42,11 +42,10 @@ class UserService {
     }
 
     async refresh(refreshToken) {
-        // logger.info(`Refreshing tokens with refresh token: ${refreshToken}`);
         if (!refreshToken) {
           throw ApiError.UnauthError();
         }
-        const tokens = await tokenService.refreshTokens(refreshToken); // Используйте camelCase
+        const tokens = await tokenService.refreshTokens(refreshToken); 
         return tokens;
       }
     

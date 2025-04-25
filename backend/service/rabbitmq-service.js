@@ -21,6 +21,7 @@ class RabbitMQService {
         }
     }
 
+    
 }
 
 module.exports = new RabbitMQService();

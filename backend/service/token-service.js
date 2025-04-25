@@ -5,19 +5,19 @@ const ApiError = require('../exceptions/api-error');
 const UserDto = require('../dtos/user-dto');
 const client = require('../config/redisClient');
 
-console.log('Current environment:', process.env.NODE_ENV); // Debugging line
-console.log('Config:', config); // Debugging line
+console.log('Current environment:', process.env.NODE_ENV);
+console.log('Config:', config);
 
 class TokenService {
   generateTokens(payload) {
-    console.log('Generating tokens with payload:', payload); // Debugging line
-    console.log('JWT_ACCESS_SECRET:', config.JWT_ACCESS_SECRET); // Debugging line
-    console.log('JWT_REFRESH_SECRET:', config.JWT_REFRESH_SECRET); // Debugging line
+    console.log('Generating tokens with payload:', payload);
+    console.log('JWT_ACCESS_SECRET:', config.JWT_ACCESS_SECRET);
+    console.log('JWT_REFRESH_SECRET:', config.JWT_REFRESH_SECRET);
     const accessToken = jwt.sign(payload, config.JWT_ACCESS_SECRET, { expiresIn: '15m' });
     const refreshToken = jwt.sign(payload, config.JWT_REFRESH_SECRET, { expiresIn: '30d' });
 
-    console.log('Generated accessToken:', accessToken); // Debugging line
-    console.log('Generated refreshToken:', refreshToken); // Debugging line
+    console.log('Generated accessToken:', accessToken); 
+    console.log('Generated refreshToken:', refreshToken);
     
     return {
       accessToken,
@@ -26,11 +26,11 @@ class TokenService {
   }
 
   async saveToken(userId, refreshToken) {
-    console.log('Saving token for user:', userId); // Debugging line
-    console.log('Refresh token:', refreshToken); // Debugging line
+    console.log('Saving token for user:', userId);
+    console.log('Refresh token:', refreshToken);
 
     if (!refreshToken) {
-        throw new Error('refresh_token is undefined'); // Debugging line to catch the issue early
+        throw new Error('refresh_token is undefined'); 
       }
 
     const tokenData = await Token.findOne({ where: { userId } });
@@ -56,34 +56,34 @@ class TokenService {
     console.log("Validating access token:", token)
     try {
       const userData = jwt.verify(token, config.JWT_ACCESS_SECRET);
-      console.log('Access token valid:', userData); // Debugging line
+      console.log('Access token valid:', userData); 
       return userData;
     } catch (e) {
-      console.error('Access token validation error:', e); // Debugging line
+      console.error('Access token validation error:', e); 
       return null;
     }
   }
 
   validateRefreshToken(token) {
-    console.log('Validating refresh token:', token); // Debugging line
+    console.log('Validating refresh token:', token); 
     try {
       const userData = jwt.verify(token, config.JWT_REFRESH_SECRET);
-      console.log('Refresh token valid:', userData); // Debugging line
+      console.log('Refresh token valid:', userData); 
       return userData;
     } catch (e) {
-      console.log('Refresh token validation error:', e); // Debugging line
+      console.log('Refresh token validation error:', e); 
       return null;
     }
   }
 
-  async refreshTokens(refreshToken) { // Обновление токенов
-    console.log('Refreshing tokens with refresh token:', refreshToken); // Debugging line
+  async refreshTokens(refreshToken) { 
+    console.log('Refreshing tokens with refresh token:', refreshToken); 
     const tokenData = await this.findToken(refreshToken);
     if (!tokenData) {
       throw ApiError.UnauthError();
     }
 
-    // Проверка актуальности refreshToken
+
     const userData = this.validateRefreshToken(refreshToken);
     if (!userData) {
       throw ApiError.UnauthError();
@@ -92,9 +92,9 @@ class TokenService {
     const userDto = new UserDto(userData);
     const tokens = this.generateTokens({ ...userDto });
 
-    // Сначала сохранение новых токенов
+
     await this.saveToken(userDto.id, tokens.refreshToken);
-    console.log('Refreshed tokens:', tokens); // Debugging line
+    console.log('Refreshed tokens:', tokens); 
 
     return { ...tokens, user: userDto };
   }

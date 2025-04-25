@@ -21,15 +21,18 @@ module.exports = (sequelize, DataTypes) => {
     transactionType: {
       type: DataTypes.STRING(20),
       allowNull: true
+    },
+    transactionStatus: { 
+      type: DataTypes.STRING(20),
+      allowNull: true
     }
   }, {
     sequelize,
     modelName: 'Transaction',
     timestamps: true,
-    underscored: true, 
+    underscored: true,
   });
   Transaction.associate = function(models) {
-    // associations can be defined here
     Transaction.belongsTo(models.Card, { foreignKey: 'cardId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
   };
   return Transaction;

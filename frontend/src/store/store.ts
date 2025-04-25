@@ -11,6 +11,8 @@ export default class Store {
     isAuth = false;
     isLoading = true;
     isAuthChecked = false;
+    private lastRefreshAttempt: number = 0;
+    private refreshDelay: number = 100;
 
     constructor() {
         makeAutoObservable(this);
@@ -42,6 +44,7 @@ export default class Store {
             navigate('/personal-cabinet');
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
+                console.error('Ошибка при входе:', error.response?.data);
             } else {
                 console.error('Произошла непредвиденная ошибка', error);
             }
@@ -56,6 +59,7 @@ export default class Store {
             this.setUser(response.data.user);
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
+                console.error('Ошибка при регистрации:', error.response?.data);
             } else {
                 console.error('Произошла непредвиденная ошибка', error);
             }
@@ -73,6 +77,7 @@ export default class Store {
         } catch (error: unknown) {
             console.log('Logout error:', error);
             if (axios.isAxiosError(error)) {
+                console.error('Ошибка при выходе:', error.response?.data);
             } else {
                 console.error('Произошла непредвиденная ошибка', error);
             }
@@ -80,6 +85,13 @@ export default class Store {
     }
 
     async checkAuth() {
+        const now = Date.now();
+        if (now - this.lastRefreshAttempt < this.refreshDelay) {
+            console.log('Запрос на обновление токена слишком частый. Ожидание...');
+            return;
+        }
+
+        this.lastRefreshAttempt = now;
         this.setLoading(true);
 
         try {
@@ -89,11 +101,10 @@ export default class Store {
             this.setUser(response.data.user);
 
         } catch (error: unknown) {
-
             if (axios.isAxiosError(error)) {
-
+                console.error('Ошибка при обновлении токена:', error.response?.data);
             } else {
-
+                console.error('Произошла непредвиденная ошибка', error);
             }
             this.setAuth(false);
         } finally {

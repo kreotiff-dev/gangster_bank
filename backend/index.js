@@ -27,17 +27,16 @@ app.use(errorMiddleware);
 // Запуск сервера
 const start = async () => {
     try {
-        // Проверка подключения к базе данных с использованием Sequelize
         await sequelize.authenticate();
         logger.info('Connection has been established successfully.');
 
-        // Синхронизация моделей с базой данных
+
         await sequelize.sync();
 
-        // Подключение к Redis
+
         await connectRedis();
 
-        // Запуск сервера
+
         app.listen(PORT, () => {
             logger.info(`Server started on port ${PORT}`);
         });

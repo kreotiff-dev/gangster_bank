@@ -10,7 +10,6 @@ interface User {
   lastName: string;
   phone: string;
   email: string;
-  // Добавьте дополнительные поля по необходимости
 }
 
 const UserProfile: React.FC = () => {
@@ -18,6 +17,7 @@ const UserProfile: React.FC = () => {
   const { store } = useContext(Context);
 
   useEffect(() => {
+    console.log('User from store:', store.user); 
 
     if (!store.user || !store.user.id) {
       console.error('User ID is missing');
