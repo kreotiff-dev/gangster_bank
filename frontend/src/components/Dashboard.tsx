@@ -75,9 +75,9 @@ const Dashboard: React.FC = () => {
   return (
     <div className={styles.dashBoard}>
       <div className={styles.balanceInfo}>
-        <div className={styles.info}>
-          <UserProfile />
-        </div>
+          <div className={styles.info}>
+            <UserProfile user={store.user} balance={balance} />
+          </div>
         <div className={styles.balance}>
           Ваш баланс: <br />
           {balance !== null ? `${balance.toLocaleString('ru-RU', { style: 'currency', currency: 'RUB' })}` : 'Загрузка...'}

@@ -1,20 +1,24 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { Context } from '../index';
+import styles from '../styles/UserProfile.module.css';
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
-interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  email: string;
-  // Добавьте дополнительные поля по необходимости
+interface UserProps {
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string;
+    avatar: string;
+  };
+  balance: number | null;
 }
 
-const UserProfile: React.FC = () => {
-  const [userData, setUserData] = useState<User | null>(null);
+const UserProfile: React.FC<UserProps> = ({ user, balance }) => {
+  const [userData, setUserData] = useState<UserProps | null>(null);
   const { store } = useContext(Context);
 
   useEffect(() => {
@@ -45,14 +49,19 @@ const UserProfile: React.FC = () => {
   }, [store.isAuth, store.user, store.user.id]);
 
   return (
-    <div className="container">
+    <div className={styles.profile}>
+      <img src={user.avatar} alt="User Avatar" className={styles.avatar} />
       {userData ? (
-        <div className="section">
-          <p>Имя: {userData.firstName || 'N/A'}</p>
-          <p>Фамилия: {userData.lastName || 'N/A'}</p>
-          <p>Email: {userData.email || 'N/A'}</p>
-          <p>Тел.: {userData.phone}</p>
+        <div className={styles.info}>
+          <strong>Имя: {userData.user.firstName || 'N/A'}</strong>
+          <p>Фамилия: {userData.user.lastName || 'N/A'}</p>
+          <p>Email: {userData.user.email || 'N/A'}</p>
+          <p>Тел.: {userData.user.phone}</p>
           {/* Дополнительные данные профиля */}
+          <div className={styles.balance}>
+            Ваш баланс: <br />
+            {balance !== null ? `${balance.toLocaleString('ru-RU', { style: 'currency', currency: 'RUB' })}` : 'Загрузка...'}
+          </div>
         </div>
       ) : (
         <p className="error-message">Ошибка при получении данных. Попробуйте обновить страницу.</p>

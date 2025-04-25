@@ -20,6 +20,10 @@ interface Card {
   cardLimit: string;
 }
 
+interface CardListProps {
+  cards: Card[];
+}
+
 const currencySymbols: { [key: string]: string } = {
   USD: '$',
   RUB: '₽',
@@ -58,8 +62,8 @@ const getCardImage = (cardType: string) => {
   }
 };
 
-const CardsList: React.FC = () => {
-  const [cards, setCards] = useState<Card[]>([]);
+const CardsList: React.FC<CardListProps> = ({ cards }) => {
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showDetails, setShowDetails] = useState(false);
@@ -76,7 +80,7 @@ const CardsList: React.FC = () => {
           return;
         }
         const cardsData = await fetchUserCards(store.user.id);
-        setCards(cardsData);
+
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch cards:', error);
