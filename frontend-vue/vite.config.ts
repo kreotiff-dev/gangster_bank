@@ -14,10 +14,23 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': 'http://localhost:3000',
-      '/docs': 'http://localhost:3000',
-      '/api-docs': 'http://localhost:3000',
-      '/swagger.json': 'http://localhost:3000',
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
+      },
+      '/docs': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/api-docs': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/swagger.json': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
     },
-  },
+  },  
 });

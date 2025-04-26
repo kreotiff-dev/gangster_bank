@@ -125,7 +125,7 @@
     errorMessage.value = ''
   
     try {
-      await axios.post('/api/auth/register', {
+      await axios.post('/api/auth/registration', {
         phone: form.value.phone,
         email: form.value.email,
         firstName: form.value.firstName,
