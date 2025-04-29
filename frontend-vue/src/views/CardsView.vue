@@ -1,63 +1,74 @@
 <template>
-    <div class="flex flex-col items-center justify-start min-h-screen p-4 bg-gray-100">
-      <div class="w-full max-w-4xl">
-        <h1 class="text-2xl font-bold mb-6 text-gray-800 text-center">Мои карты</h1>
-  
-        <div v-if="loading" class="text-center text-gray-500">Загрузка карт...</div>
-        <div v-else-if="errorMessage" class="text-center text-red-500">{{ errorMessage }}</div>
-        <div v-else-if="cards.length === 0" class="text-center text-gray-500">У вас пока нет карт.</div>
-  
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div v-for="card in cards" :key="card.id" class="bg-white rounded-lg shadow p-4">
-            <p class="text-gray-700 font-semibold">Номер карты:</p>
-            <p class="text-lg font-bold mb-2">{{ formatCardNumber(card.cardNumber) }}</p>
-
-            <p class="text-gray-700">Баланс:</p>
-            <p class="text-xl font-bold mb-2">
-                {{ formatBalance(card.cardBalance, card.currency) }}
-            </p>
-
-            <p class="text-gray-500 text-sm">Статус: {{ card.cardStatus }}</p>
-          </div>
-        </div>
+  <AppLayout>
+    <div class="space-y-6 p-4">
+      <h1 class="text-2xl font-bold text-gray-800">Мои карты</h1>
+      
+      <!-- Кнопка "Добавить новую карту" -->
+      <div class="flex justify-end">
+        <button
+          @click="onRequestNewCard"
+          class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded"
+        >
+          + Заказать карту
+        </button>
+      </div>
+      
+      <!-- Список карт -->
+      <div class="grid grid-cols-1 gap-4">
+        <CardItem
+          v-for="card in cards"
+          :key="card.id"
+          :card="card"
+        />
       </div>
     </div>
-  </template>
-  
-  <script setup lang="ts">
-  import { ref, onMounted } from 'vue'
-  import axios from 'axios'
-  
-  interface Card {
-  id: string
+  </AppLayout>
+</template>
+
+<script setup lang="ts">
+import AppLayout from '@/components/Layout/AppLayout.vue'
+import CardItem from '@/components/Cards/CardItem.vue'
+
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+interface Card {
+  id: number
+  cardholderFirstname: string
+  cardholderLastname: string
   cardNumber: string
+  expirationDate: string
   cardBalance: number
   currency: string
   cardStatus: string
-  cardType?: string
+  cardType: string
+  number: string
+  balance: number
+  type: 'debit' | 'credit'  // Changed from string to union type
 }
-  
-  const cards = ref<Card[]>([])
-  const loading = ref(true)
-  const errorMessage = ref('')
-  
-  onMounted(async () => {
-    try {
-      const response = await axios.get('/api/cards', { withCredentials: true })
-      cards.value = response.data
-    } catch (error) {
-      errorMessage.value = 'Ошибка загрузки карт.'
-    } finally {
-      loading.value = false
-    }
-  })
-  
-  function formatCardNumber(number: string): string {
-    return number.replace(/\d{4}(?=\d)/g, '$& ').replace(/.(?=.{4})/g, '*')
+
+const cards = ref<Card[]>([])
+
+const fetchCards = async () => {
+  try {
+    const response = await axios.get('/api/cards')
+    cards.value = response.data.map((card: any) => ({
+      ...card,
+      type: validateCardType(card.type),
+    }))
+  } catch (error) {
+    console.error('Ошибка загрузки карт:', error)
   }
-  
-  function formatBalance(balance: number, currency: string): string {
-    return `${balance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} ${currency}`
-  }
-  </script>
-  
+}
+
+const onRequestNewCard = () => {
+  // Пока просто заглушка — потом сделаем модалку или переход на страницу заявки
+  alert('Заявка на новую карту оформляется (будет отдельная страница)! 🚀')
+}
+
+const validateCardType = (type: string): 'debit' | 'credit' => {
+  return type === 'debit' || type === 'credit' ? type : 'debit' // Default to 'debit' if invalid
+}
+
+onMounted(fetchCards)
+</script>

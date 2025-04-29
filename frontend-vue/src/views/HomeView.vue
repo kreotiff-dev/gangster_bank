@@ -1,9 +1,20 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-    <h1 class="text-3xl font-bold text-gray-800">Главная страница</h1>
-    <p class="mt-4 text-gray-600">Вы авторизованы!</p>
-  </div>
+  <AppLayout>
+    <div class="flex flex-col space-y-6">
+      <HeaderUserInfo />
+      <BalanceCard />
+      <ActionsBanner />
+      <CardList />
+      <TransactionList />
+    </div>
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
+import AppLayout from '@/components/Layout/AppLayout.vue'
+import HeaderUserInfo from '@/components/Header/HeaderUserInfo.vue'
+import BalanceCard from '@/components/Balance/BalanceCard.vue'
+import ActionsBanner from '@/components/Actions/ActionsBanner.vue'
+import CardList from '@/components/Cards/CardList.vue'
+import TransactionList from '@/components/RecentTransactions/TransactionList.vue'
 </script>

@@ -1,0 +1,118 @@
+/* Темная тема для банковского приложения */
+
+:root {
+    /* Основные цвета */
+    --bg-primary: #000000;
+    --bg-secondary: #111111;
+    --bg-tertiary: #1A1A1A;
+    --bg-card: #1F1F1F;
+    --bg-hover: rgba(255, 255, 255, 0.08);
+    --bg-active: rgba(255, 255, 255, 0.12);
+    
+    /* Градиенты */
+    --gradient-primary: linear-gradient(135deg, #FF6B6B, #FFD166);
+    --gradient-card-primary: linear-gradient(135deg, #4A6CF7, #1E3A8A);
+    --gradient-card-secondary: linear-gradient(135deg, #111827, #374151);
+    
+    /* Цвета текста */
+    --text-primary: rgba(255, 255, 255, 0.9);
+    --text-secondary: rgba(255, 255, 255, 0.6);
+    --text-tertiary: rgba(255, 255, 255, 0.4);
+    
+    /* Цвета акцентов */
+    --accent-primary: #FF6B6B;
+    --accent-secondary: #FFD166;
+    --income-color: #50C878;
+    --expense-color: #FF6B6B;
+    
+    /* Границы */
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-active: rgba(255, 255, 255, 0.2);
+    
+    /* Тени */
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --shadow-button: 0 4px 15px rgba(255, 107, 107, 0.3);
+  }
+  
+  /* Основные стили для тела документа */
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'SF Pro Display', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Стили для скроллбара */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--bg-active);
+    border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-primary);
+  }
+  
+  /* Переопределение стилей Tailwind для тёмной темы */
+  .text-gray-600, .text-gray-500 {
+    color: var(--text-secondary) !important;
+  }
+  
+  .text-gray-800 {
+    color: var(--text-primary) !important;
+  }
+  
+  .bg-white {
+    background-color: var(--bg-card) !important;
+  }
+  
+  .border-gray-300 {
+    border-color: var(--border-color) !important;
+  }
+  
+  .border-blue-500, .hover\:border-blue-400:hover {
+    border-color: var(--accent-primary) !important;
+  }
+  
+  .text-green-600 {
+    color: var(--income-color) !important;
+  }
+  
+  .text-red-500 {
+    color: var(--expense-color) !important;
+  }
+  
+  /* Стили для активной страницы в навигации */
+  .router-link-active {
+    color: var(--accent-primary);
+  }
+  
+  /* Стили для кнопок */
+  button {
+    background-color: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    transition: all 0.2s;
+  }
+  
+  button:hover {
+    background-color: var(--bg-active);
+    border-color: var(--border-active);
+  }
+  
+  /* Стили для карточек */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-card);
+    border-radius: 16px;
+  }

@@ -4,6 +4,7 @@ import axios from 'axios'
 interface User {
   id: string
   email: string
+  phone: string
   firstName: string
   lastName: string
   avatar?: string
@@ -23,9 +24,9 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   actions: {
-    async login(email: string, password: string) {
+    async login(phone: string, password: string) {
       try {
-        const response = await axios.post('/api/auth/login', { email, password }, {
+        const response = await axios.post('/api/auth/login', { phone, password }, {
           withCredentials: true,
         })
 
@@ -64,6 +65,7 @@ export const useAuthStore = defineStore('auth', {
         localStorage.setItem('token', accessToken)
         axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
       } catch (error) {
+        console.error('Ошибка обновления токена', error)
         this.logout()
       }
     }

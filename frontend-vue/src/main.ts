@@ -6,14 +6,17 @@ import { createPinia } from 'pinia'
 import router from './router/index'
 import { useAuthStore } from '@/stores/authStore'
 
-const app = createApp(App)
+async function bootstrap() {
+  const app = createApp(App)
 
-const pinia = createPinia()
-app.use(pinia)
-app.use(router)
+  const pinia = createPinia()
+  app.use(pinia)
 
-const authStore = useAuthStore()
+  const authStore = useAuthStore()
+  await authStore.checkAuth()  // Сначала проверяем токены
 
-authStore.checkAuth().finally(() => {
+  app.use(router) // Потом только роутер
   app.mount('#app')
-})
+}
+
+bootstrap()

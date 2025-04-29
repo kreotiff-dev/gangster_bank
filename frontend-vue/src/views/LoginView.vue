@@ -5,11 +5,11 @@
   
         <form @submit.prevent="onLogin">
           <div class="mb-4">
-            <label class="block text-gray-700 mb-2" for="email">Email</label>
+            <label class="block text-gray-700 mb-2" for="phone">phone</label>
             <input
-              v-model="email"
-              id="email"
-              type="email"
+              v-model="phone"
+              id="phone"
+              type="phone"
               required
               class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -50,7 +50,7 @@
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '@/stores/authStore'
   
-  const email = ref('')
+  const phone = ref('')
   const password = ref('')
   const loading = ref(false)
   const errorMessage = ref('')
@@ -63,10 +63,10 @@
     errorMessage.value = ''
   
     try {
-      await authStore.login(email.value, password.value)
-      router.push('/profile')
+      await authStore.login(phone.value, password.value)
+      router.push('/personal-cabinet')
     } catch (error) {
-      errorMessage.value = 'Ошибка входа. Проверьте Email и пароль.'
+      errorMessage.value = 'Ошибка входа. Проверьте номер телефона и пароль.'
     } finally {
       loading.value = false
     }

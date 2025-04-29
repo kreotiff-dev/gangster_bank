@@ -66,14 +66,16 @@
     confirmPassword: ''
   })
   
-  const fields = [
-    { model: 'phone', label: 'Номер телефона', type: 'text' },
-    { model: 'email', label: 'Email', type: 'email' },
-    { model: 'firstName', label: 'Имя', type: 'text' },
-    { model: 'lastName', label: 'Фамилия', type: 'text' },
-    { model: 'password', label: 'Пароль', type: 'password' },
-    { model: 'confirmPassword', label: 'Подтвердите пароль', type: 'password' }
-  ]
+  type FormFields = keyof typeof form.value;
+  
+  const fields: { model: FormFields; label: string; type: string }[] = [
+      { model: 'phone', label: 'Номер телефона', type: 'text' },
+      { model: 'email', label: 'Email', type: 'email' },
+      { model: 'firstName', label: 'Имя', type: 'text' },
+      { model: 'lastName', label: 'Фамилия', type: 'text' },
+      { model: 'password', label: 'Пароль', type: 'password' },
+      { model: 'confirmPassword', label: 'Подтвердите пароль', type: 'password' }
+  ];
   
   function generateField(field: string) {
     switch (field) {
@@ -135,7 +137,7 @@
         withCredentials: true
       })
   
-      router.push({ path: '/confirm-code', query: { phone: form.value.phone } })
+      router.push({ path: '/confirm', query: { phone: form.value.phone } })
     } catch (error) {
       errorMessage.value = 'Ошибка регистрации. Проверьте введённые данные.'
     } finally {

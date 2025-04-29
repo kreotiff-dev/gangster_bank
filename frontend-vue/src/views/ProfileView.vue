@@ -32,7 +32,7 @@
   const router = useRouter()
   
   const user = authStore.user
-  const defaultAvatar = 'https://via.placeholder.com/96'
+  const defaultAvatar = 'https://placehold.co/96x96'
   
   const onLogout = () => {
     authStore.logout()

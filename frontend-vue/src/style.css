@@ -1,11 +1,12 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'SF Pro Display', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Используем тёмную схему по умолчанию */
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.9);
+  background-color: #000000;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,65 +16,98 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: #FF6B6B;
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: #FFD166;
 }
 
 body {
   margin: 0;
   display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: #000000;
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: 2em;
   line-height: 1.1;
+  font-weight: 600;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: white;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.2s ease;
 }
 button:hover {
-  border-color: #646cff;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px solid rgba(255, 107, 107, 0.5);
 }
 
 .card {
-  padding: 2em;
+  background: linear-gradient(135deg, #1A1A1A, #2D2D2D);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 #app {
-  max-width: 1280px;
+  width: 100%;
+  max-width: 500px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: 1rem;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Добавляем стили для карт */
+.card-gradient-primary {
+  background: linear-gradient(135deg, #4A6CF7, #1E3A8A);
+}
+
+.card-gradient-secondary {
+  background: linear-gradient(135deg, #111827, #374151);
+}
+
+.card-gradient-accent {
+  background: linear-gradient(135deg, #FF6B6B, #FFD166);
+}
+
+/* Добавляем стили для иконок транзакций */
+.transaction-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.transaction-icon-income {
+  background-color: rgba(80, 200, 120, 0.15);
+  color: #50C878;
+}
+
+.transaction-icon-expense {
+  background-color: rgba(255, 107, 107, 0.15);
+  color: #FF6B6B;
+}
+
+.transaction-icon-shopping {
+  background-color: rgba(71, 85, 105, 0.15);
+  color: #94A3B8;
 }
