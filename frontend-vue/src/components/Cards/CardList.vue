@@ -18,34 +18,129 @@
     </div>
     
     <div v-else class="cards-container">
-      <CardItem 
-        v-for="card in cards" 
-        :key="card.id" 
-        :card="processCardData(card)" 
-        :isActive="card.id === activeCardId"
-        @click="navigateToCardDetails(card.id)"
+      <!-- Используем компонент карусели с кнопкой заказа карты внутри -->
+      <CardCarousel 
+        :cards="processedCards" 
+        @card-click="navigateToCardDetails"
+        @request-new-card="onRequestNewCard"
       />
+    </div>
+    
+    <!-- Секция последних операций -->
+    <div class="section-header">
+      <div class="section-title">Последние операции</div>
+      <div class="see-all" @click="navigateToAllTransactions">История</div>
+    </div>
+    
+    <div v-if="transactionsLoading" class="loading-container">
+      <div class="spinner"></div>
+      <p class="loading-text">Загрузка операций...</p>
+    </div>
+    
+    <div v-else-if="transactionsError" class="error-container">
+      <p class="error-message">{{ transactionsError }}</p>
+      <button @click="fetchTransactions" class="retry-button">
+        Попробовать снова
+      </button>
+    </div>
+    
+    <div v-else-if="transactions.length === 0" class="empty-state">
+      <p>Нет операций для отображения</p>
+    </div>
+    
+    <div v-else class="transactions-container">
+      <!-- Фильтры транзакций -->
+      <div class="transaction-filters">
+        <div 
+          v-for="filter in transactionFilters" 
+          :key="filter.id"
+          @click="setTransactionFilter(filter.id)"
+          class="filter-option"
+          :class="{ active: currentFilter === filter.id }"
+        >
+          {{ filter.name }}
+        </div>
+      </div>
       
-      <div class="add-card-btn" @click="onRequestNewCard">
-        <div class="add-icon">+</div>
-        <div>Заказать новую карту</div>
+      <!-- Список транзакций -->
+      <div class="transactions-list">
+        <div 
+          v-for="transaction in filteredTransactions" 
+          :key="transaction.id" 
+          class="transaction-item"
+        >
+          <div class="transaction-icon" :class="getTransactionIconClass(transaction.transactionType)">
+            {{ getTransactionIcon(transaction.transactionType) }}
+          </div>
+          <div class="transaction-details">
+            <div class="transaction-title">{{ getTransactionTitle(transaction.transactionType) }}</div>
+            <div class="transaction-date">{{ formatTransactionDate(transaction.transactionDate) }}</div>
+          </div>
+          <div class="transaction-amount" :class="{ 'positive': transaction.amount > 0, 'negative': transaction.amount < 0 }">
+            {{ formatCurrency(transaction.amount) }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import CardItem from './CardItem.vue'
-import { cardsApi } from '@/services/api'
-import { Card } from '@/types'
+import CardCarousel from './CardCarousel.vue'
+import { cardsApi, transactionsApi } from '@/services/api'
+import type { Card, Transaction } from '@/types'
+import { mapCardForCardItem } from '@/utils/mappers'
 
 const router = useRouter()
+
+// Состояние для карт
 const cards = ref<Card[]>([])
 const loading = ref(true)
 const error = ref('')
 const activeCardId = ref<number | null>(null)
+
+// Состояние для транзакций
+const transactions = ref<Transaction[]>([])
+const transactionsLoading = ref(false)
+const transactionsError = ref('')
+const currentFilter = ref('all')
+
+// Фильтры транзакций
+const transactionFilters = [
+  { id: 'all', name: 'Все' },
+  { id: 'expense', name: 'Расходы' },
+  { id: 'income', name: 'Доходы' },
+  { id: 'transfers', name: 'Переводы' },
+]
+
+// Используем computed для обработки карт с помощью маппера
+const processedCards = computed(() => {
+  return cards.value.map(card => mapCardForCardItem(card))
+})
+
+// Фильтрация транзакций
+const filteredTransactions = computed(() => {
+  if (currentFilter.value === 'all') {
+    return transactions.value.slice(0, 5) // Показываем только 5 последних транзакций
+  }
+  
+  let filtered = transactions.value
+  
+  if (currentFilter.value === 'expense') {
+    filtered = filtered.filter(t => t.amount < 0)
+  } else if (currentFilter.value === 'income') {
+    filtered = filtered.filter(t => t.amount > 0)
+  } else if (currentFilter.value === 'transfers') {
+    filtered = filtered.filter(t => 
+      t.transactionType === 'transfer_in' || t.transactionType === 'transfer_out'
+    )
+  }
+  
+  return filtered.slice(0, 5) // Показываем только 5 последних транзакций
+})
 
 // Загрузка списка карт с сервера
 const fetchCards = async () => {
@@ -70,23 +165,25 @@ const fetchCards = async () => {
   }
 }
 
-// Обработка данных карты для отображения
-const processCardData = (card: any): Card => {
-  // Определяем тип карты
-  const cardType = (card.cardType || '').toLowerCase() === 'credit' ? 'credit' : 'debit'
+// Загрузка последних транзакций
+const fetchTransactions = async () => {
+  transactionsLoading.value = true
+  transactionsError.value = ''
   
-  // Форматируем дату
-  let expirationDate = card.expirationDate || ''
-  if (expirationDate && typeof expirationDate === 'string' && expirationDate.includes('T')) {
-    const date = new Date(expirationDate)
-    expirationDate = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getFullYear()).slice(-2)}`
+  try {
+    const response = await transactionsApi.getTransactions()
+    transactions.value = response.data
+    transactionsLoading.value = false
+  } catch (err: any) {
+    console.error('Ошибка загрузки транзакций:', err)
+    transactionsError.value = err.response?.data?.message || 'Не удалось загрузить операции. Пожалуйста, попробуйте позже.'
+    transactionsLoading.value = false
   }
-  
-  return {
-    ...card,
-    cardType,
-    expirationDate
-  }
+}
+
+// Установка фильтра транзакций
+const setTransactionFilter = (filterId: string) => {
+  currentFilter.value = filterId
 }
 
 // Переход на страницу с деталями карты
@@ -99,13 +196,85 @@ const navigateToAllCards = () => {
   router.push('/cards')
 }
 
+// Переход на страницу с историей транзакций
+const navigateToAllTransactions = () => {
+  router.push('/transactions')
+}
+
 // Обработчик для запроса новой карты
 const onRequestNewCard = () => {
   router.push('/cards/new')
 }
 
+// Вспомогательные функции для форматирования и отображения транзакций
+const formatTransactionDate = (date: string): string => {
+  if (!date) return '';
+  
+  try {
+    const dateObj = new Date(date);
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'][dateObj.getMonth()];
+    const hours = String(dateObj.getHours()).padStart(2, '0');
+    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+    
+    return `${day} ${month} • ${hours}:${minutes}`;
+  } catch (e) {
+    return date;
+  }
+}
+
+const formatCurrency = (amount: number): string => {
+  return amount.toLocaleString('ru-RU') + ' ₽';
+}
+
+const getTransactionIconClass = (type: string): string => {
+  if (!type) return '';
+  
+  const lowerType = type.toLowerCase();
+  if (lowerType.includes('transfer_in') || lowerType.includes('deposit')) return 'income';
+  if (lowerType.includes('shopping') || lowerType.includes('payment')) return 'shopping';
+  if (lowerType.includes('utility')) return 'utility';
+  if (lowerType.includes('food')) return 'food';
+  
+  return 'expense';
+}
+
+const getTransactionIcon = (type: string): string => {
+  if (!type) return '↔';
+  
+  const lowerType = type.toLowerCase();
+  if (lowerType.includes('transfer_in')) return '↓';
+  if (lowerType.includes('transfer_out')) return '↑';
+  if (lowerType.includes('shopping') || lowerType.includes('payment')) return '🛒';
+  if (lowerType.includes('utility')) return '🏠';
+  if (lowerType.includes('food')) return '🍔';
+  
+  return '↔';
+}
+
+const getTransactionTitle = (type: string): string => {
+  if (!type) return 'Операция';
+  
+  const typeMap: Record<string, string> = {
+    'payment': 'Оплата',
+    'withdrawal': 'Снятие наличных',
+    'transfer_out': 'Перевод',
+    'transfer_in': 'Поступление',
+    'utility_payment': 'Оплата ЖКХ',
+    'mobile_payment': 'Оплата связи',
+    'food_payment': 'Продукты',
+    'transport_payment': 'Транспорт',
+    'entertainment_payment': 'Развлечения'
+  };
+  
+  return typeMap[type.toLowerCase()] || 'Операция';
+}
+
 // Загрузка данных при монтировании компонента
-onMounted(fetchCards)
+onMounted(() => {
+  fetchCards();
+  fetchTransactions();
+});
 </script>
 
 <style scoped>
@@ -137,120 +306,160 @@ onMounted(fetchCards)
   color: rgba(255,255,255,0.8);
 }
 
-.carousel-container {
-  position: relative;
+/* Стили для секции транзакций */
+.transactions-container {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 32px;
+}
+
+.transaction-filters {
   display: flex;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.carousel-wrapper {
-  width: 100%;
-  overflow: hidden;
-}
-
-.carousel-slide {
-  display: flex;
-  gap: 16px;
-  transition: transform 0.5s ease;
-}
-
-.carousel-item {
-  flex: 0 0 auto;
-  min-width: 280px;
-  transition: all 0.3s ease;
-}
-
-.carousel-item.active {
-  transform: scale(1.02);
-}
-
-.carousel-nav {
-  position: absolute;
-  width: 36px;
-  height: 36px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  border: none;
-  color: white;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 5;
-  transition: all 0.2s ease;
-}
-
-.carousel-nav:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.carousel-nav:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.carousel-prev {
-  left: -18px;
-}
-
-.carousel-next {
-  right: -18px;
-}
-
-.carousel-indicators {
-  display: flex;
-  justify-content: center;
   gap: 8px;
-  margin-top: 16px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none; /* для Firefox */
 }
 
-.indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.2);
+.transaction-filters::-webkit-scrollbar {
+  display: none; /* для Chrome, Safari */
+}
+
+.filter-option {
+  padding: 6px 12px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  font-size: 14px;
+  white-space: nowrap;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 }
 
-.indicator.active {
-  background-color: rgba(255, 255, 255, 0.7);
-  width: 24px;
-  border-radius: 4px;
+.filter-option:hover {
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
-.add-card-btn {
-  min-width: 280px;
-  height: 170px;
-  border: 2px dashed rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
+.filter-option.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  font-weight: 500;
+}
+
+.transactions-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   gap: 12px;
-  color: rgba(255, 255, 255, 0.5);
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
   background-color: rgba(255, 255, 255, 0.03);
-  cursor: pointer;
-  transition: all 0.3s;
+  border-radius: 12px;
+  transition: background-color 0.2s;
 }
 
-.add-card-btn:hover {
-  border-color: rgba(255, 255, 255, 0.3);
-  color: rgba(255, 255, 255, 0.7);
-  background-color: rgba(255, 255, 255, 0.05);
+.transaction-item:hover {
+  background-color: rgba(255, 255, 255, 0.06);
 }
 
-.add-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+.transaction-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   background-color: rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 16px;
+  margin-right: 16px;
+}
+
+.transaction-icon.income {
+  background-color: rgba(80, 200, 120, 0.15);
+  color: #50C878;
+}
+
+.transaction-icon.expense {
+  background-color: rgba(255, 107, 107, 0.15);
+  color: #FF6B6B;
+}
+
+.transaction-icon.shopping {
+  background-color: rgba(71, 85, 105, 0.15);
+  color: #94A3B8;
+}
+
+.transaction-icon.utility {
+  background-color: rgba(249, 115, 22, 0.15);
+  color: #F97316;
+}
+
+.transaction-icon.food {
+  background-color: rgba(249, 115, 22, 0.15);
+  color: #F97316;
+}
+
+.transaction-details {
+  flex: 1;
+}
+
+.transaction-title {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.transaction-date {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.transaction-amount {
+  font-weight: 600;
+}
+
+.transaction-amount.positive {
+  color: #50C878;
+}
+
+.transaction-amount.negative {
+  color: #FF6B6B;
+}
+
+.loading-container, .error-container, .empty-state {
+  text-align: center;
+  padding: 20px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 16px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.retry-button {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
 }
 </style>

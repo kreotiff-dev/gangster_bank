@@ -1,4 +1,4 @@
-import { Card, Transaction } from '@/types';
+import type { Card, Transaction, AnalyticsCategory } from '@/types';
 
 /**
  * Преобразует данные карты с сервера в формат, удобный для отображения
@@ -19,6 +19,17 @@ export const mapCardForDisplay = (card: Card): Card => {
     expirationDate: formattedExpirationDate,
     cardNumber: maskedNumber,
     cardType
+  };
+};
+
+export const mapCardForCardItem = (card: Card) => {
+  // Нам нужно сначала распаковать все поля из card, а затем перезаписать только нужные
+  return {
+    ...card,
+    // Добавляем новые поля, не дублируя существующие
+    number: card.cardNumber,
+    balance: parseFloat(card.cardBalance.toString()),
+    type: card.cardType.toLowerCase() as 'debit' | 'credit'
   };
 };
 

@@ -4,7 +4,7 @@
       <div class="balance-label">Общий баланс</div>
       <div class="balance-amount">{{ formattedBalance }}</div>
       <div class="quick-actions">
-        <div class="action-btn">
+        <div class="action-btn" @click="openTransferModal">
           <div class="action-icon">↑</div>
           <div class="action-label">Перевести</div>
         </div>
@@ -26,18 +26,47 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useCardsStore } from '@/stores/CardsStore'
+import { storeToRefs } from 'pinia'
 
-// В реальной логике здесь будет приходить баланс пользователя
-// Пока что для примера сделаем фиксированный баланс
-const balance = 148764.32
+// Получаем хранилище карт
+const cardsStore = useCardsStore()
+const isLoading = ref(false)
+const loadError = ref<string | null>(null)
 
+// Используем storeToRefs для получения реактивного доступа к геттеру totalBalance
+// Это обеспечит автоматическое обновление при изменении баланса карт
+const { totalBalance } = storeToRefs(cardsStore)
+
+// Форматируем баланс для отображения
 const formattedBalance = computed(() => {
-  return balance.toLocaleString('ru-RU', {
+  return totalBalance.value.toLocaleString('ru-RU', {
     style: 'currency',
     currency: 'RUB',
     maximumFractionDigits: 2,
   })
+})
+
+// Функция для перехода к странице переводов
+const openTransferModal = () => {
+  // В будущем здесь может быть логика для открытия модального окна перевода
+  // или перенаправления на страницу переводов
+}
+
+// При загрузке компонента получаем карты с сервера, если они еще не загружены
+onMounted(async () => {
+  if (cardsStore.cards.length === 0) {
+    isLoading.value = true
+    try {
+      await cardsStore.fetchCards()
+    } catch (error) {
+      console.error('Ошибка при загрузке карт:', error)
+      loadError.value = 'Не удалось загрузить данные карт'
+    } finally {
+      isLoading.value = false
+    }
+  }
 })
 </script>
 

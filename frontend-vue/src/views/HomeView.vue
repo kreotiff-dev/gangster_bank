@@ -5,7 +5,7 @@
       <BalanceCard />
       <ActionsBanner />
       <CardList />
-      <TransactionList />
+      <!-- <TransactionList /> -->
     </div>
   </AppLayout>
 </template>
@@ -16,5 +16,5 @@ import HeaderUserInfo from '@/components/Header/HeaderUserInfo.vue'
 import BalanceCard from '@/components/Balance/BalanceCard.vue'
 import ActionsBanner from '@/components/Actions/ActionsBanner.vue'
 import CardList from '@/components/Cards/CardList.vue'
-import TransactionList from '@/components/RecentTransactions/TransactionList.vue'
+
 </script>

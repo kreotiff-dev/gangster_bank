@@ -153,7 +153,7 @@
   const router = useRouter()
   
   // Состояние формы
-  const cardType = ref('debit')
+  const cardType = ref<'debit' | 'credit' | undefined>('debit')
   const cardCategory = ref('Standard')
   const currency = ref('₽')
   const cardLimit = ref(50000)
@@ -207,7 +207,7 @@
         currency: currency.value,
         cardholderFirstname: cardholderFirstname.value,
         cardholderLastname: cardholderLastname.value,
-        cardLimit: cardType.value === 'credit' ? cardLimit.value : null,
+        cardLimit: cardType.value === 'credit' ? cardLimit.value : undefined,
         
         // Автоматически генерируемые данные
         cardNumber: generateCardNumber(),

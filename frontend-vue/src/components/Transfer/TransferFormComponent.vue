@@ -318,235 +318,144 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, computed, onMounted, watch } from 'vue'
-  
-  // Определение пропсов
-  interface Props {
-    initialCardId?: number | string
-  }
-  
-  const props = defineProps<Props>()
-  const emit = defineEmits(['close', 'success'])
-  
-  // Состояние формы
-  const currentStep = ref(1)
-  const selectedFromCard = ref<number | null>(null)
-  const selectedToCard = ref<number | null>(null)
-  const recipientType = ref('myCard')
-  const recipientCardNumber = ref('')
-  const recipientPhone = ref('')
-  const amount = ref('')
-  const comment = ref('')
-  const smsCode = ref('')
-  const smsVerificationCode = ref('')
-  const resendCountdown = ref(0)
-  const transferSuccess = ref(true)
-  const errorMessage = ref('')
-  
-  // Моковые данные для карт
-  const userCards = ref([
-    {
-      id: 1,
-      number: '4276123456785678',
-      balance: 42312.56,
-      currency: '₽',
-      type: 'debit'
-    },
-    {
-      id: 2,
-      number: '5489123456784321',
-      balance: 106451.76,
-      currency: '₽', 
-      type: 'credit'
-    }
-  ])
-  
-  // Вычисляемое свойство для карт-получателей
-  // (исключает выбранную карту отправителя)
-  const otherCards = computed(() => {
-    return userCards.value.filter(card => card.id !== selectedFromCard.value)
-  })
-  
-  // Инициализация формы
-  onMounted(() => {
-    // Если передан initialCardId, выбираем эту карту как карту отправителя
-    if (props.initialCardId) {
-      const cardId = typeof props.initialCardId === 'string' 
-        ? parseInt(props.initialCardId) 
-        : props.initialCardId
-      
-      const card = userCards.value.find(c => c.id === cardId)
-      if (card) {
-        selectedFromCard.value = card.id
-      }
-    }
-  })
-  
-  // Функции для навигации между шагами
-  const goToNextStep = () => {
-    if (currentStep.value < 5) {
-      currentStep.value++
+import { ref, computed, onMounted, watch } from 'vue'
+import { useCardsStore } from '@/stores/CardsStore'
+import { useTransferStore } from '@/stores/TransferStore'
+import { useNotificationStore } from '@/stores/NotificationStore'
+import { mapCardForCardItem } from '@/utils/mappers'
+import type { TransferData } from '@/types'
+
+// Определение пропсов
+interface Props {
+  initialCardId?: number | string
+}
+
+const props = defineProps<Props>()
+const emit = defineEmits(['close', 'success'])
+
+// Получаем хранилища
+const cardsStore = useCardsStore()
+const transferStore = useTransferStore()
+const notificationStore = useNotificationStore()
+
+// Состояние формы
+const currentStep = ref(1)
+const selectedFromCard = ref<number | null>(null)
+const selectedToCard = ref<number | null>(null)
+const recipientType = ref('myCard')
+const recipientCardNumber = ref('')
+const recipientPhone = ref('')
+const amount = ref('')
+const comment = ref('')
+const smsCode = ref('')
+const smsVerificationCode = ref('')
+const resendCountdown = ref(0)
+const transferSuccess = ref(true)
+const errorMessage = ref('')
+const isProcessing = ref(false)
+
+// Получаем карты пользователя из хранилища
+const userCards = computed(() => {
+  return cardsStore.cards.map(card => mapCardForCardItem(card))
+})
+
+// Вычисляемое свойство для карт-получателей
+// (исключает выбранную карту отправителя)
+const otherCards = computed(() => {
+  return userCards.value.filter(card => card.id !== selectedFromCard.value)
+})
+
+// Инициализация формы
+onMounted(async () => {
+  // Загружаем карты пользователя, если они еще не загружены
+  if (cardsStore.cards.length === 0) {
+    try {
+      await cardsStore.fetchCards()
+    } catch (error) {
+      console.error('Ошибка при загрузке карт:', error)
+      notificationStore.error('Ошибка загрузки карт', 'Не удалось загрузить информацию о ваших картах')
     }
   }
   
-  const goBackStep = () => {
-    if (currentStep.value > 1) {
-      currentStep.value--
-    }
-  }
-  
-  // Функции для выбора карт
-  const selectFromCard = (card: any) => {
-    selectedFromCard.value = card.id
+  // Если передан initialCardId, выбираем эту карту как карту отправителя
+  if (props.initialCardId) {
+    const cardId = typeof props.initialCardId === 'string' 
+      ? parseInt(props.initialCardId) 
+      : props.initialCardId
     
-    // Если выбрана та же карта, что и для получения, сбрасываем выбор получателя
-    if (selectedToCard.value === card.id) {
-      selectedToCard.value = null
-    }
-  }
-  
-  const selectToCard = (card: any) => {
-    selectedToCard.value = card.id
-  }
-  
-  // Функции форматирования ввода
-  const formatCardNumberInput = () => {
-    // Удаляем все нецифровые символы
-    let value = recipientCardNumber.value.replace(/\D/g, '')
-    
-    // Форматируем в группы по 4 цифры с пробелами
-    if (value.length > 0) {
-      let formattedValue = ''
-      for (let i = 0; i < value.length; i += 4) {
-        formattedValue += value.substring(i, i + 4) + ' '
-      }
-      recipientCardNumber.value = formattedValue.trim()
-    }
-  }
-  
-  const formatPhoneInput = () => {
-    // Удаляем все нецифровые символы
-    let value = recipientPhone.value.replace(/\D/g, '')
-    
-    // Форматируем номер телефона в формате +7 (XXX) XXX-XX-XX
-    if (value.length > 0) {
-      if (value[0] !== '7') {
-        value = '7' + value
-      }
-      
-      let formattedValue = '+'
-      
-      if (value.length > 0) {
-        formattedValue += value.substring(0, 1)
-      }
-      
-      if (value.length > 1) {
-        formattedValue += ' (' + value.substring(1, 4)
-      }
-      
-      if (value.length > 4) {
-        formattedValue += ') ' + value.substring(4, 7)
-      }
-      
-      if (value.length > 7) {
-        formattedValue += '-' + value.substring(7, 9)
-      }
-      
-      if (value.length > 9) {
-        formattedValue += '-' + value.substring(9, 11)
-      }
-      
-      recipientPhone.value = formattedValue
-    }
-  }
-  
-  const formatAmountInput = () => {
-    // Удаляем все нецифровые символы, кроме точки и запятой
-    let value = amount.value.replace(/[^\d.,]/g, '')
-    
-    // Заменяем запятую на точку
-    value = value.replace(',', '.')
-    
-    // Проверяем, что после точки не более 2 знаков
-    const parts = value.split('.')
-    if (parts.length > 1) {
-      parts[1] = parts[1].substring(0, 2)
-      value = parts.join('.')
-    }
-    
-    // Форматируем число с разделителями групп
-    const numericValue = parseFloat(value) || 0
-    amount.value = numericValue.toLocaleString('ru-RU', {
-      maximumFractionDigits: 2,
-      minimumFractionDigits: parts.length > 1 ? 2 : 0
-    }).replace(',', '.')
-  }
-  
-  // Вспомогательные функции
-  const formatCardNumber = (number: string) => {
-    if (!number) return ''
-    return number.substring(0, 4) + ' **** **** ' + number.substring(12)
-  }
-  
-  const formatCurrency = (value: number) => {
-    if (value === undefined || value === null) return '0 ₽'
-    return value.toLocaleString('ru-RU') + ' ₽'
-  }
-  
-  const getCardInfo = (cardId: number | null) => {
-    if (!cardId) return ''
     const card = userCards.value.find(c => c.id === cardId)
-    if (!card) return ''
-    return `${formatCardNumber(card.number)} (${formatCurrency(card.balance)})`
-  }
-  
-  const getCurrentDate = () => {
-    const now = new Date()
-    return now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU', {
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-  
-  const generateTransactionId = () => {
-    return Math.floor(Math.random() * 10000000000).toString().padStart(10, '0')
-  }
-  
-  // Проверка валидности данных
-  const isRecipientValid = computed(() => {
-    if (recipientType.value === 'myCard') {
-      return selectedToCard.value !== null
-    } else if (recipientType.value === 'cardNumber') {
-      return recipientCardNumber.value.replace(/\s/g, '').length === 16
-    } else if (recipientType.value === 'phone') {
-      return recipientPhone.value.replace(/\D/g, '').length === 11
+    if (card) {
+      selectedFromCard.value = card.id
     }
-    return false
-  })
+  }
+})
+
+// Функции для навигации между шагами
+const goToNextStep = () => {
+  if (currentStep.value < 5) {
+    currentStep.value++
+  }
+}
+
+const goBackStep = () => {
+  if (currentStep.value > 1) {
+    currentStep.value--
+  }
+}
+
+// Функции для выбора карт
+const selectFromCard = (card: any) => {
+  selectedFromCard.value = card.id
   
-  const isAmountValid = computed(() => {
-    if (!amount.value) return false
-    
-    const numericAmount = parseFloat(amount.value.replace(/\s/g, ''))
-    if (isNaN(numericAmount) || numericAmount <= 0) return false
-    
-    // Проверяем, достаточно ли средств на карте
-    if (selectedFromCard.value) {
-      const card = userCards.value.find(c => c.id === selectedFromCard.value)
-      if (card && numericAmount > card.balance) return false
-    }
-    
-    return true
-  })
+  // Если выбрана та же карта, что и для получения, сбрасываем выбор получателя
+  if (selectedToCard.value === card.id) {
+    selectedToCard.value = null
+  }
+}
+
+const selectToCard = (card: any) => {
+  selectedToCard.value = card.id
+}
+
+// Проверка валидности данных
+const isRecipientValid = computed(() => {
+  if (recipientType.value === 'myCard') {
+    return selectedToCard.value !== null
+  } else if (recipientType.value === 'cardNumber') {
+    return recipientCardNumber.value.replace(/\s/g, '').length === 16
+  } else if (recipientType.value === 'phone') {
+    return recipientPhone.value.replace(/\D/g, '').length === 11
+  }
+  return false
+})
+
+const isAmountValid = computed(() => {
+  if (!amount.value) return false
   
-  const isSubmitEnabled = computed(() => {
-    return smsCode.value && smsVerificationCode.value.length === 4
-  })
+  const numericAmount = parseFloat(amount.value.replace(/\s/g, '').replace(',', '.'))
+  if (isNaN(numericAmount) || numericAmount <= 0) return false
   
-  // Функции для работы с SMS
-  const requestSmsCode = () => {
-    // В реальном приложении здесь был бы запрос к API
-    smsCode.value = Math.floor(1000 + Math.random() * 9000).toString()
+  // Проверяем, достаточно ли средств на карте
+  if (selectedFromCard.value) {
+    const card = userCards.value.find(c => c.id === selectedFromCard.value)
+    if (card && numericAmount > card.balance) return false
+  }
+  
+  return true
+})
+
+const isSubmitEnabled = computed(() => {
+  return smsCode.value && smsVerificationCode.value.length === 4 && !isProcessing.value
+})
+
+// Функции для работы с SMS
+const requestSmsCode = async () => {
+  try {
+    // Вызываем метод из хранилища для получения кода SMS
+    const result = await transferStore.requestSmsCode(recipientPhone.value || '+71234567890')
+    
+    // Устанавливаем полученный код
+    smsCode.value = result.code
     resendCountdown.value = 60
     
     // Таймер обратного отсчета
@@ -557,77 +466,194 @@
       }
     }, 1000)
     
-    // Имитация отправки SMS
+    // В учебном приложении показываем код пользователю
     console.log('SMS code:', smsCode.value)
-    alert('Код подтверждения: ' + smsCode.value)
+    
+    // Используем хранилище уведомлений для информирования пользователя
+    notificationStore.info('Код подтверждения', `Код подтверждения: ${smsCode.value}`, 10000)
+  } catch (error) {
+    console.error('Ошибка при запросе SMS-кода:', error)
+    notificationStore.error('Ошибка', 'Не удалось отправить SMS-код. Пожалуйста, попробуйте еще раз.')
+  }
+}
+
+// Отправка перевода
+const submitTransfer = async () => {
+  // Проверяем код SMS
+  if (smsVerificationCode.value !== smsCode.value) {
+    errorMessage.value = 'Неверный код подтверждения. Попробуйте еще раз.'
+    smsVerificationCode.value = ''
+    transferSuccess.value = false
+    currentStep.value = 5
+    return
   }
   
-  // Отправка перевода
-  const submitTransfer = () => {
-    // Проверяем код SMS
-    if (smsVerificationCode.value !== smsCode.value) {
-      errorMessage.value = 'Неверный код подтверждения. Попробуйте еще раз.'
-      smsVerificationCode.value = ''
-      transferSuccess.value = false
-      currentStep.value = 5
-      return
+  isProcessing.value = true
+  
+  try {
+    // Подготавливаем данные для перевода
+    const numericAmount = parseFloat(amount.value.replace(/\s/g, '').replace(',', '.'))
+    
+    const transferData: TransferData = {
+      fromCardId: selectedFromCard.value as number,
+      amount: numericAmount,
+      comment: comment.value
     }
     
-    // В реальном приложении здесь был бы запрос к API
-    const numericAmount = parseFloat(amount.value.replace(/\s/g, ''))
+    // Добавляем данные получателя в зависимости от выбранного типа
+    if (recipientType.value === 'myCard') {
+      transferData.toCardId = selectedToCard.value as number
+    } else if (recipientType.value === 'cardNumber') {
+      transferData.toCardNumber = recipientCardNumber.value.replace(/\s/g, '')
+    } else if (recipientType.value === 'phone') {
+      transferData.toPhoneNumber = recipientPhone.value.replace(/\D/g, '')
+    }
     
-    // Имитация успешного перевода
-    setTimeout(() => {
-      // Обновляем баланс карт
-      const fromCard = userCards.value.find(c => c.id === selectedFromCard.value)
-      if (fromCard) {
-        fromCard.balance -= numericAmount
+    // Выполняем перевод через API
+    const result = await transferStore.transferFunds(transferData)
+    
+    transferSuccess.value = true
+    currentStep.value = 5
+    
+    // ВАЖНО: Обновляем список карт, чтобы отразить изменения баланса
+    await cardsStore.fetchCards()
+    
+    // Если перевод был между своими картами, обновляем отображение баланса для них
+    const fromCard = userCards.value.find(c => c.id === selectedFromCard.value)
+    if (fromCard) {
+      fromCard.balance -= numericAmount
+    }
+    
+    if (recipientType.value === 'myCard' && selectedToCard.value) {
+      const toCard = userCards.value.find(c => c.id === selectedToCard.value)
+      if (toCard) {
+        toCard.balance += numericAmount
       }
-      
-      if (recipientType.value === 'myCard') {
-        const toCard = userCards.value.find(c => c.id === selectedToCard.value)
-        if (toCard) {
-          toCard.balance += numericAmount
-        }
-      }
-      
-      transferSuccess.value = true
-      currentStep.value = 5
-      
-      // Уведомляем родительский компонент об успешном переводе
-  emit('success', {
-    fromCardId: selectedFromCard.value,
-    toCardId: selectedToCard.value,
-    amount: numericAmount,
-    date: getCurrentDate(),
-    transactionId: generateTransactionId()
+    }
+    
+    // Уведомляем родительский компонент об успешном переводе
+    emit('success', {
+      fromCardId: selectedFromCard.value,
+      toCardId: selectedToCard.value,
+      amount: numericAmount,
+      date: getCurrentDate(),
+      transactionId: result.transaction.id || generateTransactionId()
+    })
+  } catch (error: any) {
+    // Обработка ошибок
+  } finally {
+    isProcessing.value = false
+  }
+}
+
+// Функции форматирования ввода (оставляем без изменений)
+const formatCardNumberInput = () => {
+  // Удаляем все нецифровые символы
+  let value = recipientCardNumber.value.replace(/\D/g, '')
+  
+  // Форматируем в группы по 4 цифры с пробелами
+  if (value.length > 0) {
+    let formattedValue = ''
+    for (let i = 0; i < value.length; i += 4) {
+      formattedValue += value.substring(i, i + 4) + ' '
+    }
+    recipientCardNumber.value = formattedValue.trim()
+  }
+}
+
+const formatPhoneInput = () => {
+  // Удаляем все нецифровые символы
+  let value = recipientPhone.value.replace(/\D/g, '')
+  
+  // Форматируем номер телефона в формате +7 (XXX) XXX-XX-XX
+  if (value.length > 0) {
+    if (value[0] !== '7') {
+      value = '7' + value
+    }
+    
+    let formattedValue = '+'
+    
+    if (value.length > 0) {
+      formattedValue += value.substring(0, 1)
+    }
+    
+    if (value.length > 1) {
+      formattedValue += ' (' + value.substring(1, 4)
+    }
+    
+    if (value.length > 4) {
+      formattedValue += ') ' + value.substring(4, 7)
+    }
+    
+    if (value.length > 7) {
+      formattedValue += '-' + value.substring(7, 9)
+    }
+    
+    if (value.length > 9) {
+      formattedValue += '-' + value.substring(9, 11)
+    }
+    
+    recipientPhone.value = formattedValue
+  }
+}
+
+const formatAmountInput = () => {
+  // Удаляем все нецифровые символы, кроме точки и запятой
+  let value = amount.value.replace(/[^\d.,]/g, '')
+  
+  // Заменяем запятую на точку
+  value = value.replace(',', '.')
+  
+  // Проверяем, что после точки не более 2 знаков
+  const parts = value.split('.')
+  if (parts.length > 1) {
+    parts[1] = parts[1].substring(0, 2)
+    value = parts.join('.')
+  }
+  
+  // Форматируем число с разделителями групп
+  const numericValue = parseFloat(value) || 0
+  amount.value = numericValue.toLocaleString('ru-RU', {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: parts.length > 1 ? 2 : 0
+  }).replace(',', '.')
+}
+
+// Вспомогательные функции (оставляем без изменений)
+const formatCardNumber = (number: string) => {
+  if (!number) return ''
+  return number.substring(0, 4) + ' **** **** ' + number.substring(12)
+}
+
+const formatCurrency = (value: number) => {
+  if (value === undefined || value === null) return '0 ₽'
+  return value.toLocaleString('ru-RU') + ' ₽'
+}
+
+const getCardInfo = (cardId: number | null) => {
+  if (!cardId) return ''
+  const card = userCards.value.find(c => c.id === cardId)
+  if (!card) return ''
+  return `${formatCardNumber(card.number)} (${formatCurrency(card.balance)})`
+}
+
+const getCurrentDate = () => {
+  const now = new Date()
+  return now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU', {
+    hour: '2-digit',
+    minute: '2-digit'
   })
-}, 1500)
+}
+
+const generateTransactionId = () => {
+  return Math.floor(Math.random() * 10000000000).toString().padStart(10, '0')
 }
 
 // Открытие квитанции
 const openReceipt = () => {
   // В реальном приложении здесь была бы логика для просмотра или загрузки квитанции
-  alert('Функция просмотра квитанции будет доступна позднее')
+  notificationStore.info('Квитанция', 'Функция просмотра квитанции будет доступна позднее')
 }
-
-// Проверяем наличие данных для инициализации при монтировании компонента
-onMounted(() => {
-  // Проверка и установка начальной карты, если указана в пропсах
-  if (props.initialCardId) {
-    const cardId = typeof props.initialCardId === 'string'
-      ? parseInt(props.initialCardId)
-      : props.initialCardId
-    
-    const card = userCards.value.find(c => c.id === cardId)
-    if (card) {
-      selectedFromCard.value = card.id
-    }
-  }
-  
-  // Прекращение показа лоадера, если он был
-  // loading.value = false
-})
 
 // Следим за изменениями выбранных карт
 watch([selectedFromCard], () => {
@@ -637,8 +663,9 @@ watch([selectedFromCard], () => {
   }
 })
 
-// Сброс формы при закрытии
+// Сброс формы
 const resetForm = () => {
+  transferStore.resetState()
   currentStep.value = 1
   selectedFromCard.value = props.initialCardId ? 
     (typeof props.initialCardId === 'string' ? parseInt(props.initialCardId) : props.initialCardId) : 
@@ -654,9 +681,10 @@ const resetForm = () => {
   resendCountdown.value = 0
   transferSuccess.value = true
   errorMessage.value = ''
+  isProcessing.value = false
 }
 
-// Метод для закрытия модала с сохранением состояния после успешного перевода
+// Метод для закрытия модала
 const closeModal = () => {
   emit('close')
 }

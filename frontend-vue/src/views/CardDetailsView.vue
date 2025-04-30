@@ -130,16 +130,19 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import AppLayout from '@/components/Layout/AppLayout.vue'
 import { cardsApi, transactionsApi } from '@/services/api'
-import { Card, Transaction } from '@/types'
+import type { Card, Transaction } from '@/types'
 
-const route = useRoute()
 const router = useRouter()
 
 // Получаем ID карты из URL
-const cardId = computed(() => route.params.id)
+const props = defineProps<{
+  id: number;
+}>();
+
+const cardId = computed(() => props.id);
 
 // Состояние компонента
 const card = ref<Card | null>(null)
