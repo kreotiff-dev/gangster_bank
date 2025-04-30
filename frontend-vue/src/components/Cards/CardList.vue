@@ -88,7 +88,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import CardItem from './CardItem.vue'
 import CardCarousel from './CardCarousel.vue'
 import { cardsApi, transactionsApi } from '@/services/api'
 import type { Card, Transaction } from '@/types'
